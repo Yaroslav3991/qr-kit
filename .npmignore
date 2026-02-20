@@ -1,0 +1,10 @@
+tests/
+scripts/
+playground/
+docs/
+.git/
+.gitignore
+*.md
+!README.md
+!CHANGELOG.md
+*.log
