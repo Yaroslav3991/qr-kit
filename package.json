@@ -1,0 +1,71 @@
+{
+  "name": "qr-kit",
+  "version": "2.1.0",
+  "description": "Complete QR code toolkit. Zero dependencies. Logo overlay, PDF export, link optimizer. 5.4 kB core.",
+  "type": "module",
+  "main": "index.js",
+  "module": "index.js",
+  "types": "types/index.d.ts",
+  "exports": {
+    ".": "./index.js",
+    "./qr/qr-core": "./qr/qr-core.js",
+    "./utils/layout": "./utils/layout.js",
+    "./utils/url": "./utils/url.js",
+    "./utils/link": "./utils/link.js",
+    "./utils/logo": "./utils/logo.js",
+    "./renderers/svg": "./renderers/svg.js",
+    "./renderers/canvas": "./renderers/canvas.js",
+    "./utils/raster": "./utils/raster.js",
+    "./utils/jpegQr": "./utils/jpegQr.js",
+    "./utils/poster": "./utils/poster.js",
+    "./utils/pdf": "./utils/pdf.js",
+    "./worker/qr.worker": "./worker/qr.worker.js"
+  },
+  "scripts": {
+    "test": "node tests/run.js",
+    "test:watch": "node --watch tests/run.js",
+    "size": "node scripts/size.js"
+  },
+  "sideEffects": false,
+  "keywords": [
+    "qr",
+    "qrcode",
+    "qr-code",
+    "generator",
+    "zero-dependencies",
+    "logo",
+    "pdf",
+    "svg",
+    "react",
+    "typescript",
+    "browser",
+    "nodejs"
+  ],
+  "peerDependencies": {
+    "react": ">=17"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "files": [
+    "index.js",
+    "qr/",
+    "components/",
+    "renderers/",
+    "utils/",
+    "worker/",
+    "types/",
+    "CHANGELOG.md"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/qr-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/qr-kit/issues"
+  },
+  "homepage": "https://github.com/your-username/qr-kit#readme"
+}
