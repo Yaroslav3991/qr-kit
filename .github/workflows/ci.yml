@@ -44,4 +44,4 @@ jobs:
         run: npm install --no-save typescript @types/react
 
       - name: Check declarations compile
-        run: npx tsc --strict --noEmit --moduleResolution bundler --module esnext types/index.d.ts
+        run: npx tsc --strict --noEmit --moduleResolution bundler --module esnext --lib esnext,dom --target esnext types/index.d.ts
