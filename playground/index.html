@@ -244,26 +244,68 @@
         .toast.show {
             opacity: 1;
         }
-        .theme-btn {
+        /* Цветовые контролы как в твоём проекте */
+        .color-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        input[type="color"] {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid #2a2e3a;
+            cursor: pointer;
+            padding: 2px;
+            background: #0b0c0f;
+        }
+        .color-hex {
+            flex: 1;
+            padding: 0.6rem 1rem;
+            background: #0b0c0f;
+            border: 1px solid #2a2e3a;
+            border-radius: 12px;
+            color: #e8eaf0;
+            font-size: 0.85rem;
+            outline: none;
+        }
+        .color-hex:focus {
+            border-color: #7cfc6e;
+        }
+        /* Для вкладок внутри панели */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        /* Кнопки режимов */
+        .mode-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .mode-btn {
+            flex: 1;
             background: transparent;
             border: 1px solid #2a2e3a;
             color: #e8eaf0;
-            padding: 0.4rem 1rem;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: 0.15s;
         }
-        .theme-btn:hover {
-            border-color: #7cfc6e;
-            color: #7cfc6e;
+        .mode-btn.active {
+            background: #7cfc6e;
+            color: #000;
+            border-color: transparent;
         }
-        .mode-btn {
-            border: none;
-            padding: 0.5rem;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: 0.15s;
+        /* Поле для Branded появляется под кнопками */
+        #fnColorField {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        /* Адаптивность */
+        @media (max-width: 800px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -285,6 +327,7 @@
             </div>
         </header>
 
+        <!-- Вкладки верхнего уровня -->
         <div class="tabs" id="tabs">
             <button class="tab active" data-tab="basic">Basic</button>
             <button class="tab" data-tab="logo">Logo</button>
@@ -293,178 +336,212 @@
         </div>
 
         <div class="grid">
-            <!-- левая колонка – управление -->
+            <!-- Левая колонка – настройки -->
             <div>
-                <div class="panel" id="basic-panel">
-                    <h3 style="margin-bottom:1rem">QR Generator</h3>
-                    <div class="field">
-                        <label>Content</label>
-                        <textarea id="inputText" rows="3">https://github.com/Yaroslav3991/qr-kit</textarea>
-                    </div>
-                    <div class="row">
+                <!-- Basic panel -->
+                <div id="basic-panel" class="tab-content active">
+                    <div class="panel">
+                        <h3 style="margin-bottom:1rem">QR Generator</h3>
                         <div class="field">
-                            <label>Size (px)</label>
-                            <input type="number" id="size" value="256" min="50" max="600">
+                            <label>Content</label>
+                            <textarea id="inputText" rows="3">https://github.com/Yaroslav3991/qr-kit</textarea>
                         </div>
+                        <div class="row">
+                            <div class="field">
+                                <label>Size (px)</label>
+                                <input type="number" id="size" value="256" min="50" max="600">
+                            </div>
+                            <div class="field">
+                                <label>Margin (px)</label>
+                                <input type="number" id="margin" value="16" min="0" max="50">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="field">
+                                <label>ECC</label>
+                                <select id="ecc">
+                                    <option value="L">L (7%)</option>
+                                    <option value="M" selected>M (15%)</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Max version</label>
+                                <select id="maxVersion">
+                                    <option value="6">v6 (134B)</option>
+                                    <option value="10">v10 (271B)</option>
+                                    <option value="12">v12 (360B)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="field">
+                                <label>Foreground</label>
+                                <div class="color-row">
+                                    <input type="color" id="fgPicker" value="#000000">
+                                    <input type="text" class="color-hex" id="fgHex" value="#000000">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>Background</label>
+                                <div class="color-row">
+                                    <input type="color" id="bgPicker" value="#ffffff">
+                                    <input type="text" class="color-hex" id="bgHex" value="#ffffff">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Render mode: Basic / Rounded / Branded -->
                         <div class="field">
-                            <label>Margin (px)</label>
-                            <input type="number" id="margin" value="16" min="0" max="50">
+                            <label>Render mode</label>
+                            <div class="mode-buttons">
+                                <button type="button" class="mode-btn active" data-mode="basic">Basic</button>
+                                <button type="button" class="mode-btn" data-mode="rounded">Rounded</button>
+                                <button type="button" class="mode-btn" data-mode="branded">Branded</button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="field">
-                            <label>ECC</label>
-                            <select id="ecc">
-                                <option value="L">L (7%)</option>
-                                <option value="M" selected>M (15%)</option>
-                            </select>
+
+                        <!-- Finder color field (shown only for branded) -->
+                        <div id="fnColorField" style="display: none;">
+                            <label>Finder color</label>
+                            <div class="color-row">
+                                <input type="color" id="fnPicker" value="#f97316">
+                                <input type="text" class="color-hex" id="fnHex" value="#f97316">
+                            </div>
                         </div>
-                        <div class="field">
-                            <label>Max version</label>
-                            <select id="maxVersion">
-                                <option value="6">v6 (134B)</option>
-                                <option value="10">v10 (271B)</option>
-                                <option value="12">v12 (360B)</option>
-                            </select>
+
+                        <!-- Action buttons: Render and downloads -->
+                        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                            <button id="renderBtn" style="min-width: 120px;">Render QR</button>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="secondary" id="downloadSvg">⬇ Download SVG</button>
+                                <button class="secondary" id="downloadPng">⬇ Download PNG</button>
+                                <button class="secondary" id="downloadJpeg">⬇ Download JPEG</button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="field">
-                            <label>Foreground</label>
-                            <input type="color" id="fg" value="#000000">
-                        </div>
-                        <div class="field">
-                            <label>Background</label>
-                            <input type="color" id="bg" value="#ffffff">
-                        </div>
-                    </div>
-                    <div class="field" id="fnColorField" style="display:none;">
-                        <label>Finder color</label>
-                        <input type="color" id="fnColor" value="#f97316">
-                    </div>
-                    <div class="field">
-                        <label>Render mode</label>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <button type="button" class="mode-btn" data-mode="basic" style="flex:1; background:#7cfc6e; color:#000;">Basic</button>
-                            <button type="button" class="mode-btn" data-mode="rounded" style="flex:1; background:transparent; border:1px solid #2a2e3a; color:#e8eaf0;">Rounded</button>
-                            <button type="button" class="mode-btn" data-mode="branded" style="flex:1; background:transparent; border:1px solid #2a2e3a; color:#e8eaf0;">Branded</button>
-                        </div>
-                    </div>
-                    <div class="button-group">
-                        <button id="renderBtn">Render QR</button>
-                        <button class="secondary" id="downloadSvg">SVG</button>
-                        <button class="secondary" id="downloadPng">PNG</button>
-                        <button class="secondary" id="downloadJpeg">JPEG</button>
-                    </div>
-                    <div style="margin-top: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                        <button class="theme-btn" data-fg="#000000" data-bg="#ffffff">◼ Classic</button>
-                        <button class="theme-btn" data-fg="#ffffff" data-bg="#000000">◻ Inverted</button>
-                        <button class="theme-btn" data-fg="#7cfc6e" data-bg="#0b0c0f">● Neon</button>
-                        <button class="theme-btn" data-fg="#1a1a2e" data-bg="#e8e8e8">◈ Midnight</button>
-                        <button class="theme-btn" data-fg="#8b5cf6" data-bg="#faf5ff">✦ Violet</button>
                     </div>
                 </div>
 
-                <div class="panel" id="logo-panel" style="display:none">
-                    <h3 style="margin-bottom:1rem">Logo Overlay</h3>
-                    <div class="field">
-                        <label>Logo image</label>
-                        <input type="file" id="logoFile" accept="image/*">
-                    </div>
-                    <div class="row">
+                <!-- Logo panel (без изменений, но добавим цветовой пикер как везде) -->
+                <div id="logo-panel" class="tab-content">
+                    <div class="panel">
+                        <h3 style="margin-bottom:1rem">Logo Overlay</h3>
                         <div class="field">
-                            <label>Coverage (%)</label>
-                            <input type="number" id="coverage" value="11" min="1" max="20">
+                            <label>Logo image</label>
+                            <input type="file" id="logoFile" accept="image/*">
+                        </div>
+                        <div class="row">
+                            <div class="field">
+                                <label>Coverage (%)</label>
+                                <input type="number" id="coverage" value="6" min="1" max="20">
+                            </div>
+                            <div class="field">
+                                <label>Padding (px)</label>
+                                <input type="number" id="logoPadding" value="4" min="0" max="20">
+                            </div>
                         </div>
                         <div class="field">
-                            <label>Padding (px)</label>
-                            <input type="number" id="logoPadding" value="4" min="0" max="20">
+                            <label>Logo background color</label>
+                            <div class="color-row">
+                                <input type="color" id="logoBgPicker" value="#ffffff">
+                                <input type="text" class="color-hex" id="logoBgHex" value="#ffffff">
+                            </div>
+                        </div>
+                        <button id="renderLogoBtn">Render with logo</button>
+                        <div id="logoDownloadButtons" style="display: none; margin-top: 1rem;">
+                            <div class="button-group">
+                                <button class="secondary" id="downloadLogoSvg" title="Download as SVG">⬇ Download SVG</button>
+                                <button class="secondary" id="downloadLogoPng" title="Download as PNG">⬇ Download PNG</button>
+                            </div>
                         </div>
                     </div>
-                    <div class="field">
-                        <label>Logo background color</label>
-                        <input type="color" id="logoBg" value="#ffffff">
-                    </div>
-                    <button id="renderLogoBtn">Render with logo</button>
                 </div>
 
-                <div class="panel" id="link-panel" style="display:none">
-                    <h3 style="margin-bottom:1rem">Link Builder</h3>
-                    <div class="field">
-                        <label>Base URL</label>
-                        <input type="text" id="baseUrl" value="https://example.com/landing">
-                    </div>
-                    <div class="field">
-                        <label>JSON payload</label>
-                        <textarea id="payload" rows="4">{"userId":"abc123","plan":"pro","code":"SUMMER2024"}</textarea>
-                    </div>
-                    <div class="row">
+                <!-- Link Builder panel -->
+                <div id="link-panel" class="tab-content">
+                    <div class="panel">
+                        <h3 style="margin-bottom:1rem">Link Builder</h3>
                         <div class="field">
-                            <label>Param name</label>
-                            <input type="text" id="paramName" value="data">
+                            <label>Base URL</label>
+                            <input type="text" id="baseUrl" value="https://example.com/landing">
                         </div>
                         <div class="field">
-                            <label>Trim key</label>
-                            <input type="text" id="trimKey" value="code">
+                            <label>JSON payload</label>
+                            <textarea id="payload" rows="4">{"userId":"abc123","plan":"pro","code":"SUMMER2024"}</textarea>
                         </div>
+                        <div class="row">
+                            <div class="field">
+                                <label>Param name</label>
+                                <input type="text" id="paramName" value="data">
+                            </div>
+                            <div class="field">
+                                <label>Trim key</label>
+                                <input type="text" id="trimKey" value="code">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="field">
+                                <label>Budget (bytes)</label>
+                                <input type="number" id="budget" value="134" min="10" max="400">
+                            </div>
+                            <div class="field">
+                                <label>Strategy</label>
+                                <select id="strategy">
+                                    <option value="trim">trim</option>
+                                    <option value="drop">drop</option>
+                                    <option value="error">error</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button id="buildLinkBtn">Build link</button>
+                        <div class="url-result" id="linkResult" style="display: none;"></div>
+                        <button id="useQrUrlBtn" style="display: none; margin-top: 1rem;">Use QR URL in generator</button>
                     </div>
-                    <div class="row">
-                        <div class="field">
-                            <label>Budget (bytes)</label>
-                            <input type="number" id="budget" value="134" min="10" max="400">
-                        </div>
-                        <div class="field">
-                            <label>Strategy</label>
-                            <select id="strategy">
-                                <option value="trim">trim</option>
-                                <option value="drop">drop</option>
-                                <option value="error">error</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button id="buildLinkBtn">Build link</button>
-                    <div class="url-result" id="linkResult"></div>
                 </div>
 
-                <div class="panel" id="pdf-panel" style="display:none">
-                    <h3 style="margin-bottom:1rem">PDF Export</h3>
-                    <div class="row">
-                        <div class="field">
-                            <label>Page width (pt)</label>
-                            <input type="number" id="pageW" value="595.276" step="0.1">
+                <!-- PDF Export panel -->
+                <div id="pdf-panel" class="tab-content">
+                    <div class="panel">
+                        <h3 style="margin-bottom:1rem">PDF Export</h3>
+                        <div class="row">
+                            <div class="field">
+                                <label>Page width (pt)</label>
+                                <input type="number" id="pageW" value="595.276" step="0.1">
+                            </div>
+                            <div class="field">
+                                <label>Page height (pt)</label>
+                                <input type="number" id="pageH" value="841.89" step="0.1">
+                            </div>
                         </div>
-                        <div class="field">
-                            <label>Page height (pt)</label>
-                            <input type="number" id="pageH" value="841.89" step="0.1">
+                        <div class="row">
+                            <div class="field">
+                                <label>QR X (pt)</label>
+                                <input type="number" id="pdfX" value="420">
+                            </div>
+                            <div class="field">
+                                <label>QR Y (pt)</label>
+                                <input type="number" id="pdfY" value="130">
+                            </div>
+                            <div class="field">
+                                <label>QR size (pt)</label>
+                                <input type="number" id="pdfSize" value="160">
+                            </div>
                         </div>
+                        <div class="row">
+                            <div class="field">
+                                <label>Title</label>
+                                <input type="text" id="pdfTitle" value="My QR Code">
+                            </div>
+                            <div class="field">
+                                <label>Organization</label>
+                                <input type="text" id="pdfOrg" value="Your Company">
+                            </div>
+                        </div>
+                        <button id="downloadPdf">Download PDF</button>
                     </div>
-                    <div class="row">
-                        <div class="field">
-                            <label>QR X (pt)</label>
-                            <input type="number" id="pdfX" value="420">
-                        </div>
-                        <div class="field">
-                            <label>QR Y (pt)</label>
-                            <input type="number" id="pdfY" value="130">
-                        </div>
-                        <div class="field">
-                            <label>QR size (pt)</label>
-                            <input type="number" id="pdfSize" value="160">
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label>Title</label>
-                        <input type="text" id="pdfTitle" value="My QR Code">
-                    </div>
-                    <div class="field">
-                        <label>Organization (optional)</label>
-                        <input type="text" id="pdfOrg" value="Your Company">
-                    </div>
-                    <button id="downloadPdf">Download PDF</button>
                 </div>
             </div>
 
-            <!-- правая колонка – предпросмотр -->
+            <!-- Правая колонка – предпросмотр -->
             <div>
                 <div class="panel" style="padding:1rem">
                     <div class="qr-stage" id="qrStage">
@@ -483,18 +560,18 @@
 
     <div class="toast" id="toast">Copied!</div>
 
-    <script type="importmap">
-        {
-            "imports": {
-                "qr-kit": "https://esm.sh/qr-kit@2.1.0",
-                "qr-kit/": "https://esm.sh/qr-kit@2.1.0/"
-            }
+<script type="importmap">
+    {
+        "imports": {
+            "qr-kit": "https://esm.sh/qr-kit@2.2.3",
+            "qr-kit/": "https://esm.sh/qr-kit@2.2.3/"
         }
-    </script>
+    }
+</script>
 
     <script type="module">
         import { makeQr } from 'qr-kit';
-        import { makeQrSvgString, makeQrPathSplit } from 'qr-kit/renderers/svg';
+        import { makeQrSvgString } from 'qr-kit/renderers/svg';
         import { downloadQrPng } from 'qr-kit/utils/raster';
         import { downloadQrJpeg } from 'qr-kit/utils/jpegQr';
         import { buildQrLink } from 'qr-kit/utils/link';
@@ -503,7 +580,7 @@
         import { computeLayout } from 'qr-kit/utils/layout';
 
         // DOM elements
-        const tabs = document.querySelectorAll('.tab');
+        const tabs = document.querySelectorAll('#tabs .tab');
         const panels = {
             basic: document.getElementById('basic-panel'),
             logo: document.getElementById('logo-panel'),
@@ -521,44 +598,7 @@
         let currentSvgString = '';
         let currentMode = 'basic'; // 'basic', 'rounded', 'branded'
         let currentFnColor = '#f97316';
-
-        // --- Mode switching ---
-        function setMode(mode) {
-            currentMode = mode;
-            document.querySelectorAll('.mode-btn').forEach(btn => {
-                if (btn.dataset.mode === mode) {
-                    btn.style.background = '#7cfc6e';
-                    btn.style.color = '#000';
-                    btn.style.border = '1px solid transparent';
-                } else {
-                    btn.style.background = 'transparent';
-                    btn.style.color = '#e8eaf0';
-                    btn.style.border = '1px solid #2a2e3a';
-                }
-            });
-            document.getElementById('fnColorField').style.display = mode === 'branded' ? 'block' : 'none';
-            renderBasic();
-        }
-
-        document.querySelectorAll('.mode-btn').forEach(btn => {
-            btn.addEventListener('click', () => setMode(btn.dataset.mode));
-        });
-
-        document.getElementById('fnColor').addEventListener('input', (e) => {
-            currentFnColor = e.target.value;
-            if (currentMode === 'branded') renderBasic();
-        });
-
-        // --- Theme buttons ---
-        document.querySelectorAll('.theme-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const fg = btn.dataset.fg;
-                const bg = btn.dataset.bg;
-                document.getElementById('fg').value = fg;
-                document.getElementById('bg').value = bg;
-                renderBasic();
-            });
-        });
+        let logoDataUrl = null;
 
         // --- Tab switching ---
         tabs.forEach(tab => {
@@ -568,59 +608,90 @@
                 const target = tab.dataset.tab;
                 Object.values(panels).forEach(p => p.style.display = 'none');
                 panels[target].style.display = 'block';
+                if (target === 'basic' || target === 'logo') {
+                    renderBasic();
+                }
             });
         });
 
-        // --- Render QR from model (used by renderBasic) ---
-        function renderQr(model) {
-            const size = parseInt(document.getElementById('size').value) || 256;
-            const margin = parseInt(document.getElementById('margin').value) || 16;
-            const fg = document.getElementById('fg').value;
-            const bg = document.getElementById('bg').value;
+        // --- Render mode buttons ---
+        const modeBtns = document.querySelectorAll('.mode-btn');
+        const fnColorField = document.getElementById('fnColorField');
 
-            let rounded = false;
-            if (currentMode === 'rounded') {
-                rounded = true;
-            } else if (currentMode === 'basic') {
-                const roundedCheckbox = document.getElementById('rounded');
-                rounded = roundedCheckbox ? roundedCheckbox.checked : false;
-            }
-
-            let svgString;
-            if (currentMode === 'branded') {
-                const { dataPath, functionPath } = makeQrPathSplit(model, { size, margin });
-                const title = 'QR Code';
-                const escapedTitle = title.replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
-                const { outer } = computeLayout(model.size, size, margin);
-                svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="${outer}" height="${outer}" viewBox="0 0 ${outer} ${outer}" role="img" aria-label="${escapedTitle}" shape-rendering="crispEdges">
-                    <title>${escapedTitle}</title>
-                    <rect width="100%" height="100%" fill="${bg.replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]))}"/>
-                    <path fill="${fg.replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]))}" d="${dataPath}"/>
-                    <path fill="${currentFnColor.replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]))}" d="${functionPath}"/>
-                </svg>`;
-            } else {
-                svgString = makeQrSvgString(model, { size, margin, fg, bg, rounded });
-            }
-
-            qrStage.innerHTML = svgString;
-            currentSvgString = svgString;
-
-            metaVersion.textContent = model.version;
-            metaSize.textContent = model.size + '×' + model.size;
-            metaEcc.textContent = model.eccLevel;
-            metaBytes.textContent = new TextEncoder().encode(document.getElementById('inputText').value).length;
+        function setMode(mode) {
+            currentMode = mode;
+            modeBtns.forEach(btn => {
+                if (btn.dataset.mode === mode) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            fnColorField.style.display = mode === 'branded' ? 'block' : 'none';
+            renderBasic();
         }
 
-        // --- Main render function (called on input change) ---
+        modeBtns.forEach(btn => {
+            btn.addEventListener('click', () => setMode(btn.dataset.mode));
+        });
+
+        // --- Color picker sync helpers ---
+        function setupColorPicker(pickerId, hexId, callback) {
+            const picker = document.getElementById(pickerId);
+            const hex = document.getElementById(hexId);
+            picker.addEventListener('input', () => {
+                hex.value = picker.value;
+                if (callback) callback(picker.value);
+                else renderBasic();
+            });
+            hex.addEventListener('input', () => {
+                if (/^#[0-9A-F]{6}$/i.test(hex.value)) {
+                    picker.value = hex.value;
+                    if (callback) callback(picker.value);
+                    else renderBasic();
+                }
+            });
+        }
+
+        setupColorPicker('fgPicker', 'fgHex');
+        setupColorPicker('bgPicker', 'bgHex');
+        setupColorPicker('fnPicker', 'fnHex', (val) => {
+            currentFnColor = val;
+            if (currentMode === 'branded') renderBasic();
+        });
+
+        // Logo color picker
+        setupColorPicker('logoBgPicker', 'logoBgHex');
+
+        // --- Render function ---
         async function renderBasic() {
             const text = document.getElementById('inputText').value || ' ';
             const ecc = document.getElementById('ecc').value;
             const maxVersion = parseInt(document.getElementById('maxVersion').value);
+            const size = parseInt(document.getElementById('size').value) || 256;
+            const margin = parseInt(document.getElementById('margin').value) || 16;
+            const fg = document.getElementById('fgPicker').value;
+            const bg = document.getElementById('bgPicker').value;
 
             try {
                 const model = makeQr(text, { eccLevel: ecc, maxVersion });
                 currentModel = model;
-                renderQr(model);
+
+                let svgString;
+                if (currentMode === 'branded') {
+                    svgString = makeQrSvgString(model, { size, margin, fg, bg, fnColor: currentFnColor });
+                } else {
+                    const rounded = currentMode === 'rounded';
+                    svgString = makeQrSvgString(model, { size, margin, fg, bg, rounded });
+                }
+
+                qrStage.innerHTML = svgString;
+                currentSvgString = svgString;
+
+                metaVersion.textContent = model.version;
+                metaSize.textContent = model.size + '×' + model.size;
+                metaEcc.textContent = model.eccLevel;
+                metaBytes.textContent = new TextEncoder().encode(text).length;
             } catch (e) {
                 qrStage.innerHTML = `<div style="color:#ff5c5c">Error: ${e.message}</div>`;
                 currentModel = null;
@@ -631,6 +702,7 @@
 
         // --- Download handlers ---
         document.getElementById('downloadSvg').addEventListener('click', () => {
+            if (!currentSvgString) { toastMsg('Generate a QR first'); return; }
             const blob = new Blob([currentSvgString], { type: 'image/svg+xml' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -641,7 +713,7 @@
 
         document.getElementById('downloadPng').addEventListener('click', async () => {
             const svg = document.querySelector('#qrStage svg');
-            if (!svg) return;
+            if (!svg) { toastMsg('Generate a QR first'); return; }
             await downloadQrPng(svg, { fileName: 'qr.png' });
             toastMsg('PNG downloaded');
         });
@@ -650,8 +722,8 @@
             const text = document.getElementById('inputText').value;
             const size = parseInt(document.getElementById('size').value);
             const margin = parseInt(document.getElementById('margin').value);
-            const fg = document.getElementById('fg').value;
-            const bg = document.getElementById('bg').value;
+            const fg = document.getElementById('fgPicker').value;
+            const bg = document.getElementById('bgPicker').value;
             const ecc = document.getElementById('ecc').value;
             const maxVersion = parseInt(document.getElementById('maxVersion').value);
 
@@ -665,8 +737,7 @@
             toastMsg('JPEG downloaded');
         });
 
-        // --- Logo ---
-        let logoDataUrl = null;
+        // --- Logo tab ---
         document.getElementById('logoFile').addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -685,11 +756,11 @@
             const maxVersion = parseInt(document.getElementById('maxVersion').value);
             const size = parseInt(document.getElementById('size').value);
             const margin = parseInt(document.getElementById('margin').value);
-            const fg = document.getElementById('fg').value;
-            const bg = document.getElementById('bg').value;
+            const fg = document.getElementById('fgPicker').value;
+            const bg = document.getElementById('bgPicker').value;
             const coverage = parseInt(document.getElementById('coverage').value) / 100;
             const logoPadding = parseInt(document.getElementById('logoPadding').value);
-            const logoBg = document.getElementById('logoBg').value;
+            const logoBg = document.getElementById('logoBgPicker').value;
 
             try {
                 const model = makeQr(text, { eccLevel: ecc, maxVersion });
@@ -708,9 +779,29 @@
                 metaSize.textContent = model.size + '×' + model.size;
                 metaEcc.textContent = model.eccLevel;
                 metaBytes.textContent = new TextEncoder().encode(text).length;
+
+                document.getElementById('logoDownloadButtons').style.display = 'block';
             } catch (e) {
                 qrStage.innerHTML = `<div style="color:#ff5c5c">Logo error: ${e.message}</div>`;
             }
+        });
+
+        // Download from logo tab
+        document.getElementById('downloadLogoSvg').addEventListener('click', () => {
+            if (!currentSvgString) return;
+            const blob = new Blob([currentSvgString], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'qr-with-logo.svg'; a.click();
+            URL.revokeObjectURL(url);
+            toastMsg('SVG downloaded');
+        });
+
+        document.getElementById('downloadLogoPng').addEventListener('click', async () => {
+            const svg = document.querySelector('#qrStage svg');
+            if (!svg) return;
+            await downloadQrPng(svg, { fileName: 'qr-with-logo.png' });
+            toastMsg('PNG downloaded');
         });
 
         // --- Link Builder ---
@@ -735,6 +826,7 @@
                 });
 
                 const resultDiv = document.getElementById('linkResult');
+                const useBtn = document.getElementById('useQrUrlBtn');
 
                 let statusHtml = '';
                 if (result.error) {
@@ -758,11 +850,19 @@
                 resultDiv.style.display = 'block';
 
                 if (result.qrUrl) {
-                    document.getElementById('inputText').value = result.qrUrl;
-                    renderBasic();
+                    useBtn.style.display = 'inline-block';
+                    useBtn.onclick = () => {
+                        document.getElementById('inputText').value = result.qrUrl;
+                        tabs[0].click(); // switch to basic tab
+                        renderBasic();
+                    };
+                } else {
+                    useBtn.style.display = 'none';
                 }
             } catch (e) {
                 document.getElementById('linkResult').innerHTML = `<span style="color:#ff5c5c">Invalid JSON: ${e.message}</span>`;
+                document.getElementById('linkResult').style.display = 'block';
+                document.getElementById('useQrUrlBtn').style.display = 'none';
             }
         });
 
@@ -808,10 +908,14 @@
         // Initial render
         renderBasic();
 
-        // Update on any input change (debounced)
-        const inputs = ['inputText', 'size', 'margin', 'ecc', 'maxVersion', 'fg', 'bg', 'rounded'];
+        // Update on any input change (debounced) for basic panel
+        const inputs = ['inputText', 'size', 'margin', 'ecc', 'maxVersion'];
+        let debounceTimer;
         inputs.forEach(id => {
-            document.getElementById(id).addEventListener('input', renderBasic);
+            document.getElementById(id).addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(renderBasic, 150);
+            });
         });
     </script>
 </body>
