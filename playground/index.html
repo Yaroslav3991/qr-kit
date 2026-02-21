@@ -1,477 +1,818 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>qr-kit — Demo</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0b0c0f;--surface:#13151a;--border:#222530;--accent:#7cfc6e;--accent2:#4af0c4;--red:#ff5c5c;--text:#e8eaf0;--muted:#5a5f73;--mono:'DM Mono',monospace;--sans:'Syne',sans-serif}
-html{font-size:16px;background:var(--bg);color:var(--text)}
-body{font-family:var(--sans);min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:48px 48px;opacity:.4;pointer-events:none}
-header{position:relative;z-index:1;padding:36px 48px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:20px}
-.logo-mark{width:44px;height:44px;flex-shrink:0;background:var(--accent);display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr 1fr;gap:3px;padding:6px;border-radius:8px}
-.logo-mark span{background:var(--bg);border-radius:2px}
-.logo-mark span:nth-child(1),.logo-mark span:nth-child(3),.logo-mark span:nth-child(7),.logo-mark span:nth-child(9){background:var(--accent)}
-.header-title{font-size:1.1rem;font-weight:600}
-.header-sub{font-size:.8rem;color:var(--muted);font-family:var(--mono);margin-top:2px}
-.header-badges{margin-left:auto;display:flex;gap:8px}
-.badge{font-family:var(--mono);font-size:.7rem;padding:4px 10px;border-radius:100px;border:1px solid var(--border);color:var(--muted)}
-.badge.green{border-color:var(--accent);color:var(--accent)}
-main{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:44px 48px 80px;display:grid;grid-template-columns:1fr 340px;gap:32px;align-items:start}
-.panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden}
-.panel-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.panel-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
-.panel-title{font-size:.8rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.panel-body{padding:24px 20px}
-.field{margin-bottom:18px}
-label{display:block;font-family:var(--mono);font-size:.72rem;color:var(--muted);margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase}
-input[type=text],textarea,select{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:.85rem;outline:none;transition:border-color .2s;appearance:none}
-input[type=text]:focus,textarea:focus,select:focus{border-color:var(--accent)}
-textarea{resize:vertical;min-height:68px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
-.range-row{display:flex;align-items:center;gap:10px}
-.range-val{font-family:var(--mono);font-size:.8rem;color:var(--accent);min-width:36px;text-align:right}
-.color-row{display:flex;align-items:center;gap:10px}
-input[type=color]{width:36px;height:36px;border-radius:8px;border:1px solid var(--border);cursor:pointer;padding:2px;background:var(--bg)}
-.color-hex{flex:1;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:.85rem;outline:none}
-.color-hex:focus{border-color:var(--accent)}
-.seg-control{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
-.seg-control button{flex:1;padding:8px 0;background:transparent;border:none;border-right:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:.78rem;cursor:pointer;transition:background .15s,color .15s}
-.seg-control button:last-child{border-right:none}
-.seg-control button.active{background:var(--accent);color:var(--bg);font-weight:600}
-.actions{display:flex;flex-direction:column;gap:10px;margin-top:4px}
-.btn{width:100%;padding:12px;border-radius:8px;border:none;cursor:pointer;font-family:var(--sans);font-size:.9rem;font-weight:600;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
-.btn-primary{background:var(--accent);color:var(--bg)}
-.btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
-.btn-secondary{background:transparent;color:var(--text);border:1px solid var(--border)}
-.btn-secondary:hover{border-color:var(--accent2);color:var(--accent2)}
-.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);font-size:.8rem}
-.btn-ghost:hover{color:var(--text);border-color:var(--muted)}
-.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;filter:none!important}
-.qr-panel{position:sticky;top:24px}
-.qr-stage{padding:28px 20px;display:flex;justify-content:center;align-items:center;min-height:280px;transition:background .3s}
-.qr-stage svg{display:block;border-radius:4px}
-.qr-error{font-family:var(--mono);font-size:.78rem;color:var(--red);text-align:center;padding:16px;line-height:1.6}
-.qr-meta{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:16px;flex-wrap:wrap}
-.meta-item{display:flex;flex-direction:column;gap:2px}
-.meta-label{font-family:var(--mono);font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-.meta-value{font-family:var(--mono);font-size:.8rem;color:var(--accent)}
-.url-result{margin-top:12px;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:.75rem;word-break:break-all;line-height:1.6;color:var(--muted);display:none}
-.url-result.visible{display:block}
-.url-result strong{color:var(--accent2);display:block;margin-bottom:4px;font-size:.65rem;text-transform:uppercase;letter-spacing:.06em}
-.url-result span{color:var(--text)}
-.tabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto}
-.tab{padding:12px 18px;cursor:pointer;font-size:.8rem;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s,border-color .15s;background:none;border-left:none;border-right:none;border-top:none;font-family:var(--sans);white-space:nowrap}
-.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-.tab-content{display:none}
-.tab-content.active{display:block}
-#toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--accent);color:var(--bg);padding:10px 24px;border-radius:100px;font-size:.85rem;font-weight:600;opacity:0;transition:all .3s;pointer-events:none;z-index:999}
-#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.tag-chip{display:inline-flex;align-items:center;padding:3px 9px;border-radius:100px;background:color-mix(in srgb,var(--accent) 12%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);font-family:var(--mono);font-size:.7rem;color:var(--accent);margin:2px}
-.tag-chip.red{background:color-mix(in srgb,var(--red) 12%,transparent);border-color:color-mix(in srgb,var(--red) 30%,transparent);color:var(--red)}
-.divider{height:1px;background:var(--border);margin:18px 0}
-.section-label{font-family:var(--mono);font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
-.info-box{padding:10px 14px;background:color-mix(in srgb,var(--accent2) 8%,transparent);border:1px solid color-mix(in srgb,var(--accent2) 25%,transparent);border-radius:8px;font-family:var(--mono);font-size:.73rem;color:var(--accent2);line-height:1.6;margin-bottom:16px}
-.pdf-preview-wrap{margin-top:16px;border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;background:#fff}
-.pdf-preview-wrap canvas{display:block;width:100%;height:auto}
-.pdf-preview-label{position:absolute;top:8px;left:8px;font-family:var(--mono);font-size:.62rem;color:var(--muted);background:var(--bg);padding:2px 8px;border-radius:4px;border:1px solid var(--border)}
-@keyframes fadeIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
-.qr-stage svg{animation:fadeIn .2s ease}
-@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
-.pulse{animation:pulse 2s infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.spinner{width:18px;height:18px;border:2px solid transparent;border-top-color:var(--bg);border-radius:50%;animation:spin .7s linear infinite}
-@media(max-width:860px){main{grid-template-columns:1fr;padding:24px 20px 60px}.qr-panel{position:static}header{padding:24px 20px}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>qr-kit · playground</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: #0b0c0f;
+            color: #e8eaf0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            line-height: 1.5;
+            padding: 2rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+        header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+        }
+        .logo {
+            background: #7cfc6e;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            gap: 3px;
+            padding: 6px;
+        }
+        .logo span {
+            background: #0b0c0f;
+            border-radius: 2px;
+        }
+        .logo span:nth-child(1),
+        .logo span:nth-child(3),
+        .logo span:nth-child(7),
+        .logo span:nth-child(9) {
+            background: #7cfc6e;
+        }
+        .title h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        .title p {
+            color: #5a5f73;
+            font-size: 0.9rem;
+        }
+        .badge {
+            margin-left: auto;
+            display: flex;
+            gap: 0.5rem;
+        }
+        .badge a {
+            color: #7cfc6e;
+            text-decoration: none;
+            border: 1px solid #2a2e3a;
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            transition: 0.15s;
+        }
+        .badge a:hover {
+            border-color: #7cfc6e;
+            background: #1f232b;
+        }
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 1px solid #2a2e3a;
+            padding-bottom: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .tab {
+            background: none;
+            border: none;
+            color: #5a5f73;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 30px;
+            transition: 0.15s;
+        }
+        .tab:hover {
+            color: #e8eaf0;
+            background: #1f232b;
+        }
+        .tab.active {
+            background: #7cfc6e;
+            color: #0b0c0f;
+        }
+        .panel {
+            background: #13151a;
+            border: 1px solid #2a2e3a;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 2rem;
+        }
+        .qr-stage {
+            background: #fff;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            padding: 1rem;
+            border: 1px solid #2a2e3a;
+        }
+        .qr-stage svg, .qr-stage canvas {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+        }
+        .field {
+            margin-bottom: 1.2rem;
+        }
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: #5a5f73;
+            margin-bottom: 0.3rem;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 0.6rem 1rem;
+            background: #0b0c0f;
+            border: 1px solid #2a2e3a;
+            border-radius: 12px;
+            color: #e8eaf0;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: #7cfc6e;
+        }
+        .row {
+            display: flex;
+            gap: 1rem;
+        }
+        .row .field {
+            flex: 1;
+        }
+        button {
+            background: #7cfc6e;
+            color: #0b0c0f;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.15s;
+            border: 1px solid transparent;
+        }
+        button:hover {
+            background: #9aff8e;
+            transform: translateY(-1px);
+        }
+        button.secondary {
+            background: transparent;
+            border: 1px solid #2a2e3a;
+            color: #e8eaf0;
+        }
+        button.secondary:hover {
+            border-color: #7cfc6e;
+            color: #7cfc6e;
+        }
+        .button-group {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .meta {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: #5a5f73;
+        }
+        .meta span {
+            color: #7cfc6e;
+            font-weight: 600;
+            margin-left: 0.3rem;
+        }
+        .url-result {
+            background: #0b0c0f;
+            border: 1px solid #2a2e3a;
+            border-radius: 12px;
+            padding: 1rem;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 0.8rem;
+            margin-top: 1rem;
+        }
+        .tag {
+            display: inline-block;
+            background: #1f232b;
+            color: #7cfc6e;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 30px;
+            margin-left: 0.5rem;
+        }
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #7cfc6e;
+            color: #0b0c0f;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            opacity: 0;
+            transition: 0.2s;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .toast.show {
+            opacity: 1;
+        }
+        .theme-btn {
+            background: transparent;
+            border: 1px solid #2a2e3a;
+            color: #e8eaf0;
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .theme-btn:hover {
+            border-color: #7cfc6e;
+            color: #7cfc6e;
+        }
+        .mode-btn {
+            border: none;
+            padding: 0.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+    </style>
 </head>
 <body>
-<header>
-  <div class="logo-mark"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
-  <div>
-    <div class="header-title">qr-kit</div>
-    <div class="header-sub">zero-dependency QR generator · interactive demo</div>
-  </div>
-  <div class="header-badges">
-    <span class="badge green">✓ no libs</span>
-    <span class="badge">ESM</span>
-    <span class="badge">TS types</span>
-  </div>
-</header>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span></span><span></span><span></span>
+                <span></span><span></span><span></span>
+                <span></span><span></span><span></span>
+            </div>
+            <div class="title">
+                <h1>qr-kit · playground</h1>
+                <p>zero‑dependency QR toolkit – try it live</p>
+            </div>
+            <div class="badge">
+                <a href="https://github.com/Yaroslav3991/qr-kit" target="_blank">GitHub</a>
+                <a href="https://www.npmjs.com/package/qr-kit" target="_blank">npm</a>
+            </div>
+        </header>
 
-<main>
-  <div>
-    <div class="panel" style="margin-bottom:24px">
-      <div class="tabs">
-        <button class="tab active" onclick="switchTab('generator')">QR Generator</button>
-        <button class="tab" onclick="switchTab('urlbuilder')">Link Builder</button>
-        <button class="tab" onclick="switchTab('pdf')">PDF Export</button>
-        <button class="tab" onclick="switchTab('download')">Download</button>
-      </div>
-
-      <!-- GENERATOR -->
-      <div id="tab-generator" class="tab-content active"><div class="panel-body">
-        <div class="section-label">Input</div>
-        <div class="field"><label>Content</label><textarea id="qrValue">https://github.com/your-org/qr-code</textarea></div>
-        <div class="divider"></div>
-        <div class="section-label">QR Options</div>
-        <div class="row" style="margin-bottom:18px">
-          <div class="field" style="margin:0"><label>ECC Level</label><div class="seg-control"><button class="active" onclick="setEcc('L',this)">L</button><button onclick="setEcc('M',this)">M</button></div></div>
-          <div class="field" style="margin:0"><label>Max Version</label><select id="maxVersion" onchange="render()"><option value="1">v1 (~17B)</option><option value="2">v2 (~32B)</option><option value="3">v3 (~53B)</option><option value="4">v4 (~78B)</option><option value="5">v5 (~106B)</option><option value="6" selected>v6 (~134B)</option><option value="8">v8 (~192B)</option><option value="10">v10 (~271B)</option><option value="12">v12 (~360B)</option></select></div>
-        </div>
-        <div class="field"><label>Size — <span id="sizeVal">240</span>px</label><div class="range-row"><input type="range" id="qrSize" min="80" max="400" value="240" oninput="updateRange('qrSize','sizeVal');render()"><span class="range-val" id="sizeVal2">240</span></div></div>
-        <div class="field"><label>Margin — <span id="marginVal">16</span>px</label><div class="range-row"><input type="range" id="qrMargin" min="0" max="48" value="16" oninput="updateRange('qrMargin','marginVal');render()"><span class="range-val" id="marginVal2">16</span></div></div>
-        <div class="divider"></div>
-        <div class="section-label">Colours</div>
-        <div class="row">
-          <div class="field" style="margin:0"><label>Foreground</label><div class="color-row"><input type="color" id="fgPicker" value="#000000" oninput="syncColor('fg')"><input type="text" class="color-hex" id="fgHex" value="#000000" oninput="syncHex('fg')"></div></div>
-          <div class="field" style="margin:0"><label>Background</label><div class="color-row"><input type="color" id="bgPicker" value="#ffffff" oninput="syncColor('bg')"><input type="text" class="color-hex" id="bgHex" value="#ffffff" oninput="syncHex('bg')"></div></div>
-        </div>
-        <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn btn-ghost" style="width:auto;padding:5px 12px" onclick="setTheme('#000','#fff')">◼ Classic</button>
-          <button class="btn btn-ghost" style="width:auto;padding:5px 12px" onclick="setTheme('#fff','#000')">◻ Inverted</button>
-          <button class="btn btn-ghost" style="width:auto;padding:5px 12px" onclick="setTheme('#7cfc6e','#0b0c0f')">● Neon</button>
-          <button class="btn btn-ghost" style="width:auto;padding:5px 12px" onclick="setTheme('#1a1a2e','#e8e8e8')">◈ Midnight</button>
-          <button class="btn btn-ghost" style="width:auto;padding:5px 12px" onclick="setTheme('#8b5cf6','#faf5ff')">✦ Violet</button>
-        </div>
-      </div></div>
-
-      <!-- LINK BUILDER -->
-      <div id="tab-urlbuilder" class="tab-content"><div class="panel-body">
-        <div class="section-label">Build a compact QR URL</div>
-        <p style="font-size:.82rem;color:var(--muted);margin-bottom:18px;line-height:1.6">Encode any JSON payload as Base64 into a URL param. Auto-trims to fit the QR byte budget.</p>
-        <div class="field"><label>Base URL</label><input type="text" id="lb_baseUrl" value="https://example.com/landing" oninput="buildLink()"></div>
-        <div class="field"><label>JSON Payload</label><textarea id="lb_payload" oninput="buildLink()">{"userId":"abc123","plan":"pro","code":"SUMMER2024"}</textarea></div>
-        <div class="row" style="margin-bottom:18px">
-          <div class="field" style="margin:0"><label>Param name</label><input type="text" id="lb_param" value="data" oninput="buildLink()"></div>
-          <div class="field" style="margin:0"><label>Trim key</label><input type="text" id="lb_trimKey" value="code" oninput="buildLink()"></div>
-        </div>
-        <div class="row" style="margin-bottom:18px">
-          <div class="field" style="margin:0"><label>Budget (bytes)</label><input type="text" id="lb_budget" value="134" oninput="buildLink()"></div>
-          <div class="field" style="margin:0"><label>Strategy</label><select id="lb_strategy" onchange="buildLink()"><option value="trim" selected>trim</option><option value="drop">drop</option><option value="error">error</option></select></div>
-        </div>
-        <div id="lb_result" class="url-result"></div>
-        <button class="btn btn-secondary" style="margin-top:12px" onclick="useLinkInQr()">→ Use qrUrl in QR Generator</button>
-      </div></div>
-
-      <!-- PDF EXPORT -->
-      <div id="tab-pdf" class="tab-content"><div class="panel-body">
-        <div class="section-label">PDF Export — QR by coordinates</div>
-        <div class="info-box">PDF coordinates start from the <strong>bottom-left</strong> corner.<br>A4 = 595 × 842 pt &nbsp;|&nbsp; A5 = 420 × 595 pt &nbsp;|&nbsp; Letter = 612 × 792 pt<br>The preview below updates live as you change the values.</div>
-
-        <div class="field"><label>Page size</label><div class="seg-control" id="pageSegCtrl"><button class="active" onclick="setPdfPage('a4',this)">A4</button><button onclick="setPdfPage('a5',this)">A5</button><button onclick="setPdfPage('letter',this)">Letter</button></div></div>
-
-        <div class="field"><label>QR position &amp; size (pt from bottom-left)</label>
-          <div class="row3">
-            <div><label>X</label><input type="text" id="pdf_x" value="420" oninput="updatePdfPreview()"></div>
-            <div><label>Y</label><input type="text" id="pdf_y" value="130" oninput="updatePdfPreview()"></div>
-            <div><label>Size</label><input type="text" id="pdf_size" value="160" oninput="updatePdfPreview()"></div>
-          </div>
+        <div class="tabs" id="tabs">
+            <button class="tab active" data-tab="basic">Basic</button>
+            <button class="tab" data-tab="logo">Logo</button>
+            <button class="tab" data-tab="link">Link Builder</button>
+            <button class="tab" data-tab="pdf">PDF Export</button>
         </div>
 
-        <!-- Live preview -->
-        <div class="pdf-preview-wrap"><canvas id="pdfCanvas"></canvas><span class="pdf-preview-label">live preview (not to scale)</span></div>
+        <div class="grid">
+            <!-- левая колонка – управление -->
+            <div>
+                <div class="panel" id="basic-panel">
+                    <h3 style="margin-bottom:1rem">QR Generator</h3>
+                    <div class="field">
+                        <label>Content</label>
+                        <textarea id="inputText" rows="3">https://github.com/Yaroslav3991/qr-kit</textarea>
+                    </div>
+                    <div class="row">
+                        <div class="field">
+                            <label>Size (px)</label>
+                            <input type="number" id="size" value="256" min="50" max="600">
+                        </div>
+                        <div class="field">
+                            <label>Margin (px)</label>
+                            <input type="number" id="margin" value="16" min="0" max="50">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="field">
+                            <label>ECC</label>
+                            <select id="ecc">
+                                <option value="L">L (7%)</option>
+                                <option value="M" selected>M (15%)</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Max version</label>
+                            <select id="maxVersion">
+                                <option value="6">v6 (134B)</option>
+                                <option value="10">v10 (271B)</option>
+                                <option value="12">v12 (360B)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="field">
+                            <label>Foreground</label>
+                            <input type="color" id="fg" value="#000000">
+                        </div>
+                        <div class="field">
+                            <label>Background</label>
+                            <input type="color" id="bg" value="#ffffff">
+                        </div>
+                    </div>
+                    <div class="field" id="fnColorField" style="display:none;">
+                        <label>Finder color</label>
+                        <input type="color" id="fnColor" value="#f97316">
+                    </div>
+                    <div class="field">
+                        <label>Render mode</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button type="button" class="mode-btn" data-mode="basic" style="flex:1; background:#7cfc6e; color:#000;">Basic</button>
+                            <button type="button" class="mode-btn" data-mode="rounded" style="flex:1; background:transparent; border:1px solid #2a2e3a; color:#e8eaf0;">Rounded</button>
+                            <button type="button" class="mode-btn" data-mode="branded" style="flex:1; background:transparent; border:1px solid #2a2e3a; color:#e8eaf0;">Branded</button>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button id="renderBtn">Render QR</button>
+                        <button class="secondary" id="downloadSvg">SVG</button>
+                        <button class="secondary" id="downloadPng">PNG</button>
+                        <button class="secondary" id="downloadJpeg">JPEG</button>
+                    </div>
+                    <div style="margin-top: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button class="theme-btn" data-fg="#000000" data-bg="#ffffff">◼ Classic</button>
+                        <button class="theme-btn" data-fg="#ffffff" data-bg="#000000">◻ Inverted</button>
+                        <button class="theme-btn" data-fg="#7cfc6e" data-bg="#0b0c0f">● Neon</button>
+                        <button class="theme-btn" data-fg="#1a1a2e" data-bg="#e8e8e8">◈ Midnight</button>
+                        <button class="theme-btn" data-fg="#8b5cf6" data-bg="#faf5ff">✦ Violet</button>
+                    </div>
+                </div>
 
-        <div style="margin-top:16px">
-          <div class="field"><label>File name</label><input type="text" id="pdf_filename" value="qr-code.pdf"></div>
-          <div class="field"><label>Title text in PDF</label><input type="text" id="pdf_title" value="My QR Code"></div>
-        </div>
+                <div class="panel" id="logo-panel" style="display:none">
+                    <h3 style="margin-bottom:1rem">Logo Overlay</h3>
+                    <div class="field">
+                        <label>Logo image</label>
+                        <input type="file" id="logoFile" accept="image/*">
+                    </div>
+                    <div class="row">
+                        <div class="field">
+                            <label>Coverage (%)</label>
+                            <input type="number" id="coverage" value="11" min="1" max="20">
+                        </div>
+                        <div class="field">
+                            <label>Padding (px)</label>
+                            <input type="number" id="logoPadding" value="4" min="0" max="20">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Logo background color</label>
+                        <input type="color" id="logoBg" value="#ffffff">
+                    </div>
+                    <button id="renderLogoBtn">Render with logo</button>
+                </div>
 
-        <button class="btn btn-primary" id="pdfBtn" onclick="generatePdf()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Download PDF
-        </button>
-        <p style="margin-top:10px;font-size:.72rem;color:var(--muted);font-family:var(--mono);line-height:1.5">Built 100% in the browser — no server, no libraries. Open in any PDF viewer to scan the QR.</p>
-      </div></div>
+                <div class="panel" id="link-panel" style="display:none">
+                    <h3 style="margin-bottom:1rem">Link Builder</h3>
+                    <div class="field">
+                        <label>Base URL</label>
+                        <input type="text" id="baseUrl" value="https://example.com/landing">
+                    </div>
+                    <div class="field">
+                        <label>JSON payload</label>
+                        <textarea id="payload" rows="4">{"userId":"abc123","plan":"pro","code":"SUMMER2024"}</textarea>
+                    </div>
+                    <div class="row">
+                        <div class="field">
+                            <label>Param name</label>
+                            <input type="text" id="paramName" value="data">
+                        </div>
+                        <div class="field">
+                            <label>Trim key</label>
+                            <input type="text" id="trimKey" value="code">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="field">
+                            <label>Budget (bytes)</label>
+                            <input type="number" id="budget" value="134" min="10" max="400">
+                        </div>
+                        <div class="field">
+                            <label>Strategy</label>
+                            <select id="strategy">
+                                <option value="trim">trim</option>
+                                <option value="drop">drop</option>
+                                <option value="error">error</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button id="buildLinkBtn">Build link</button>
+                    <div class="url-result" id="linkResult"></div>
+                </div>
 
-      <!-- DOWNLOAD -->
-      <div id="tab-download" class="tab-content"><div class="panel-body">
-        <div class="section-label">Download</div>
-        <div class="actions">
-          <button class="btn btn-primary" onclick="downloadSvg()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download SVG</button>
-          <button class="btn btn-secondary" onclick="downloadPng()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download PNG (3×)</button>
-          <button class="btn btn-secondary" onclick="downloadJpeg()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download JPEG</button>
+                <div class="panel" id="pdf-panel" style="display:none">
+                    <h3 style="margin-bottom:1rem">PDF Export</h3>
+                    <div class="row">
+                        <div class="field">
+                            <label>Page width (pt)</label>
+                            <input type="number" id="pageW" value="595.276" step="0.1">
+                        </div>
+                        <div class="field">
+                            <label>Page height (pt)</label>
+                            <input type="number" id="pageH" value="841.89" step="0.1">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="field">
+                            <label>QR X (pt)</label>
+                            <input type="number" id="pdfX" value="420">
+                        </div>
+                        <div class="field">
+                            <label>QR Y (pt)</label>
+                            <input type="number" id="pdfY" value="130">
+                        </div>
+                        <div class="field">
+                            <label>QR size (pt)</label>
+                            <input type="number" id="pdfSize" value="160">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Title</label>
+                        <input type="text" id="pdfTitle" value="My QR Code">
+                    </div>
+                    <div class="field">
+                        <label>Organization (optional)</label>
+                        <input type="text" id="pdfOrg" value="Your Company">
+                    </div>
+                    <button id="downloadPdf">Download PDF</button>
+                </div>
+            </div>
+
+            <!-- правая колонка – предпросмотр -->
+            <div>
+                <div class="panel" style="padding:1rem">
+                    <div class="qr-stage" id="qrStage">
+                        <div id="qrOutput"></div>
+                    </div>
+                    <div class="meta">
+                        <div>version <span id="metaVersion">-</span></div>
+                        <div>size <span id="metaSize">-</span></div>
+                        <div>ECC <span id="metaEcc">-</span></div>
+                        <div>bytes <span id="metaBytes">-</span></div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="divider"></div>
-        <div class="section-label">Copy</div>
-        <div class="actions">
-          <button class="btn btn-ghost" onclick="copySvgSource()">Copy SVG source</button>
-          <button class="btn btn-ghost" onclick="copyDataUrl()">Copy PNG data URL</button>
-        </div>
-      </div></div>
     </div>
-  </div>
 
-  <!-- RIGHT: QR PREVIEW -->
-  <div class="qr-panel">
-    <div class="panel">
-      <div class="panel-header"><div class="panel-dot pulse"></div><span class="panel-title">Live Preview</span></div>
-      <div class="qr-stage" id="qrStage"><div id="qrOutput"></div></div>
-      <div class="qr-meta">
-        <div class="meta-item"><span class="meta-label">Version</span><span class="meta-value" id="metaVersion">—</span></div>
-        <div class="meta-item"><span class="meta-label">Matrix</span><span class="meta-value" id="metaMatrix">—</span></div>
-        <div class="meta-item"><span class="meta-label">ECC</span><span class="meta-value" id="metaEcc">—</span></div>
-        <div class="meta-item"><span class="meta-label">Bytes</span><span class="meta-value" id="metaBytes">—</span></div>
-      </div>
-    </div>
-  </div>
-</main>
+    <div class="toast" id="toast">Copied!</div>
 
-<div id="toast"></div>
+    <script type="importmap">
+        {
+            "imports": {
+                "qr-kit": "https://esm.sh/qr-kit@2.1.0",
+                "qr-kit/": "https://esm.sh/qr-kit@2.1.0/"
+            }
+        }
+    </script>
 
-<script type="module">
-/* qr-core inlined */
-function makeQr(t,o={}){const{eccLevel:ecc='M',maxVersion:mv=6}=o;const by=utf8Encode(t);const sp=pickVersion(by.length,ecc,mv);const{version:v,size:sz,dataCodewords:dc,ecPerBlock:ep,blocks:bl}=sp;const bi=[];const cb=ccBB(v);pB(bi,0x4,4);pB(bi,by.length,cb);for(const b of by)pB(bi,b,8);const mdb=dc*8;const rm=mdb-bi.length;if(rm<0)throw new Error(`Input too long for versions 1–${mv} at EC level ${ecc}.`);pB(bi,0,Math.min(4,Math.max(rm,0)));while(bi.length%8!==0)pB(bi,0,1);const da=[];for(let i=0;i<bi.length;i+=8)da.push(bSTB(bi,i));const pd=[0xec,0x11];for(let i=0;da.length<dc;i++)da.push(pd[i&1]);const bArr=[];let p=0;for(const g of bl){for(let k=0;k<g.count;k++){const ch=da.slice(p,p+g.data);p+=g.data;bArr.push({data:ch,ec:rsC(ch,ep)});}}const il=[];const ml=Math.max(...bArr.map(b=>b.data.length));for(let i=0;i<ml;i++)for(const b of bArr)if(i<b.data.length)il.push(b.data[i]);for(let i=0;i<ep;i++)for(const b of bArr)il.push(b.ec[i]);const fb=bTB(il);const rem=remB(v);for(let i=0;i<rem;i++)fb.push(0);const mo=iM(sz);pFP(mo,v);pDB(mo,fb);let bm=0,bs=Infinity,best=null;for(let mask=0;mask<8;mask++){const cl=clM(mo);aM(cl,mask);const sc=pen(cl);if(sc<bs){bs=sc;bm=mask;best=cl;}}wFI(best,eLB(ecc),bm);wVI(best,v);return{version:v,size:sz,modules:best,eccLevel:ecc};}
-const ECT={L:{1:{ecPerBlock:7,blocks:[{count:1,data:19}]},2:{ecPerBlock:10,blocks:[{count:1,data:34}]},3:{ecPerBlock:15,blocks:[{count:1,data:55}]},4:{ecPerBlock:20,blocks:[{count:1,data:80}]},5:{ecPerBlock:26,blocks:[{count:1,data:108}]},6:{ecPerBlock:18,blocks:[{count:2,data:68}]},7:{ecPerBlock:20,blocks:[{count:2,data:78}]},8:{ecPerBlock:24,blocks:[{count:2,data:97}]},9:{ecPerBlock:30,blocks:[{count:2,data:116}]},10:{ecPerBlock:18,blocks:[{count:2,data:68},{count:2,data:69}]},11:{ecPerBlock:20,blocks:[{count:4,data:81}]},12:{ecPerBlock:24,blocks:[{count:2,data:92},{count:2,data:93}]}},M:{1:{ecPerBlock:10,blocks:[{count:1,data:16}]},2:{ecPerBlock:16,blocks:[{count:1,data:28}]},3:{ecPerBlock:26,blocks:[{count:1,data:44}]},4:{ecPerBlock:18,blocks:[{count:2,data:32}]},5:{ecPerBlock:24,blocks:[{count:2,data:43}]},6:{ecPerBlock:16,blocks:[{count:4,data:27}]},7:{ecPerBlock:18,blocks:[{count:4,data:31}]},8:{ecPerBlock:22,blocks:[{count:2,data:38},{count:2,data:39}]},9:{ecPerBlock:22,blocks:[{count:3,data:36},{count:2,data:37}]},10:{ecPerBlock:26,blocks:[{count:4,data:43},{count:1,data:44}]},11:{ecPerBlock:30,blocks:[{count:1,data:50},{count:4,data:51}]},12:{ecPerBlock:22,blocks:[{count:6,data:36},{count:2,data:37}]}}};
-function remB(v){if(v===1)return 0;if(v>=2&&v<=6)return 7;if(v>=7&&v<=13)return 0;if(v>=14&&v<=20)return 3;if(v>=21&&v<=27)return 4;if(v>=28&&v<=34)return 3;return 0;}
-function pickVersion(bl,ec,mv){for(let v=1;v<=mv;v++){const r=ECT[ec][v];if(!r)continue;const dc=r.blocks.reduce((s,g)=>s+g.count*g.data,0);if(4+ccBB(v)+(bl*8)+4<=dc*8){return{version:v,size:17+4*v,dataCodewords:dc,ecPerBlock:r.ecPerBlock,blocks:r.blocks}; }}throw new Error(`Input too long for versions 1–${mv} at EC level ${ec}.`);}
-function ccBB(v){return v<=9?8:16;}
-function iM(n){const m=new Array(n);for(let i=0;i<n;i++)m[i]=new Array(n).fill(null);return m;}
-function clM(m){return m.map(r=>r.slice());}
-function sM(M,x,y,d){if(y>=0&&y<M.length&&x>=0&&x<M.length)M[y][x]=d?1:0;}
-function sR(M,x,y){if(y>=0&&y<M.length&&x>=0&&x<M.length&&M[y][x]===null)M[y][x]=0;}
-function pF(M,x,y){for(let dy=0;dy<7;dy++)for(let dx=0;dx<7;dx++){const o=dx===0||dx===6||dy===0||dy===6,i=dx>=2&&dx<=4&&dy>=2&&dy<=4;sM(M,x+dx,y+dy,o||i);}for(let i=-1;i<=7;i++){sR(M,x-1,y+i);sR(M,x+7,y+i);sR(M,x+i,y-1);sR(M,x+i,y+7);}}
-function pAl(M,x,y){for(let dy=0;dy<5;dy++)for(let dx=0;dx<5;dx++){const o=dx===0||dx===4||dy===0||dy===4,c=dx===2&&dy===2;sM(M,x+dx,y+dy,o||c);}}
-const ALN={1:[],2:[6,18],3:[6,22],4:[6,26],5:[6,30],6:[6,34],7:[6,22,38],8:[6,24,42],9:[6,26,46],10:[6,28,50],11:[6,30,54],12:[6,32,58]};
-function rFmt(M){const n=M.length;for(let i=0;i<9;i++)if(M[8][i]===null)M[8][i]=0;for(let i=0;i<9;i++)if(M[i][8]===null)M[i][8]=0;for(let i=0;i<8;i++)if(M[8][n-1-i]===null)M[8][n-1-i]=0;for(let i=0;i<7;i++)if(M[n-1-i][8]===null)M[n-1-i][8]=0;}
-function rVA(M,v){if(v<7)return;const n=M.length;for(let y=0;y<6;y++)for(let x=0;x<3;x++)sR(M,n-11+x,y);for(let y=0;y<3;y++)for(let x=0;x<6;x++)sR(M,x,n-11+y);}
-function pFP(M,v){const n=M.length;pF(M,0,0);pF(M,n-7,0);pF(M,0,n-7);for(let i=8;i<n-8;i++){sM(M,6,i,i%2===0);sM(M,i,6,i%2===0);}if(v>=2){const c=ALN[v]||[];for(const cy of c)for(const cx of c){if((cx<=8&&cy<=8)||(cx>=n-9&&cy<=8)||(cx<=8&&cy>=n-9))continue;pAl(M,cx-2,cy-2);}}sM(M,8,4*v+9,1);rVA(M,v);rFmt(M);}
-function pDB(M,db){const n=M.length;let bi=0,up=true;for(let x=n-1;x>0;x-=2){if(x===6)x--;for(let yo=0;yo<n;yo++){const y=up?n-1-yo:yo;for(let dx=0;dx<2;dx++){const xx=x-dx;if(M[y][xx]!==null)continue;M[y][xx]=(bi<db.length?db[bi++]:0)?1:0;}}up=!up;}}
-function aM(M,mid){const n=M.length,v=(n-17)/4,f=iM(n);pFP(f,v);for(let y=0;y<n;y++)for(let x=0;x<n;x++){if(f[y][x]!==null)continue;if(mFn(mid,x,y))M[y][x]^=1;}}
-function mFn(id,x,y){switch(id){case 0:return(x+y)%2===0;case 1:return y%2===0;case 2:return x%3===0;case 3:return(x+y)%3===0;case 4:return(Math.floor(y/2)+Math.floor(x/3))%2===0;case 5:return((x*y)%2)+((x*y)%3)===0;case 6:return(((x*y)%2)+((x*y)%3))%2===0;case 7:return(((x+y)%2)+((x*y)%3))%2===0;default:return false;}}
-function pen(M){const n=M.length;let sc=0;const lp=a=>{let s=0,r=a[0],l=1;for(let i=1;i<a.length;i++){if(a[i]===r)l++;else{if(l>=5)s+=3+(l-5);r=a[i];l=1;}}if(l>=5)s+=3+(l-5);return s;};for(let y=0;y<n;y++)sc+=lp(M[y]);for(let x=0;x<n;x++){const c=new Array(n);for(let y=0;y<n;y++)c[y]=M[y][x];sc+=lp(c);}for(let y=0;y<n-1;y++)for(let x=0;x<n-1;x++){const c=M[y][x]+M[y][x+1]+M[y+1][x]+M[y+1][x+1];if(c===0||c===4)sc+=3;}const ct=(a,p)=>{for(let i=0;i<=a.length-p.length;i++){let ok=true;for(let j=0;j<p.length;j++)if(a[i+j]!==p[j]){ok=false;break;}if(ok)return true;}return false;};const pt=[0,0,0,0,1,0,1,1,1,0,1,0,0,0,0];for(let y=0;y<n;y++)if(ct(M[y],pt))sc+=40;for(let x=0;x<n;x++){const c=new Array(n);for(let y=0;y<n;y++)c[y]=M[y][x];if(ct(c,pt))sc+=40;}let bk=0;for(let y=0;y<n;y++)for(let x=0;x<n;x++)if(M[y][x])bk++;sc+=Math.floor(Math.abs((bk*100)/(n*n)-50)/5)*10;return sc;}
-function eLB(l){return l==='L'?1:l==='M'?0:l==='Q'?3:2;}
-function wFI(M,e,mi){const d=(e<<3)|(mi&7),bch=fBCH(d),val=((d<<10)|bch)^0x5412,n=M.length;for(let i=0;i<6;i++)M[i][8]=M[8][i]=(val>>i)&1;M[7][8]=(val>>6)&1;M[8][8]=(val>>7)&1;M[8][7]=(val>>8)&1;for(let i=9;i<15;i++)M[14-i][8]=(val>>i)&1;for(let i=0;i<8;i++)M[n-1-i][8]=(val>>i)&1;for(let i=8;i<15;i++)M[8][n-15+i]=(val>>i)&1;}
-function fBCH(d){let v=d<<10;const g=0x537;for(let i=14;i>=10;i--)if(((v>>i)&1))v^=g<<(i-10);return v&0x3ff;}
-function pB(b,v,l){for(let i=l-1;i>=0;i--)b.push((v>>i)&1);}
-function bSTB(b,i){let v=0;for(let j=0;j<8;j++)v=(v<<1)|(b[i+j]||0);return v&0xff;}
-function bTB(a){const o=[];for(const b of a)pB(o,b,8);return o;}
-function utf8Encode(s){const e=[];for(let i=0;i<s.length;i++){let c=s.charCodeAt(i);if(c<0x80)e.push(c);else if(c<0x800)e.push(0xc0|(c>>6),0x80|(c&0x3f));else if(c>=0xd800&&c<=0xdbff){const hi=c,lo=s.charCodeAt(++i);const cp=(hi-0xd800)*0x400+(lo-0xdc00)+0x10000;e.push(0xf0|(cp>>18),0x80|((cp>>12)&0x3f),0x80|((cp>>6)&0x3f),0x80|(cp&0x3f));}else e.push(0xe0|(c>>12),0x80|((c>>6)&0x3f),0x80|(c&0x3f));}return e;}
-const GF=(()=>{const ex=new Array(512),lg=new Array(256);let x=1;for(let i=0;i<255;i++){ex[i]=x;lg[x]=i;x<<=1;if(x&0x100)x^=0x11d;}for(let i=255;i<512;i++)ex[i]=ex[i-255];return{ex,lg,mul:(a,b)=>a&&b?ex[lg[a]+lg[b]]:0};})();
-function rsGP(d){let p=[1];for(let i=0;i<d;i++){const n=new Array(p.length+1).fill(0);for(let j=0;j<p.length;j++){n[j]^=GF.mul(p[j],1);n[j+1]^=GF.mul(p[j],GF.ex[i]);}p=n;}return p;}
-function rsC(data,ec){const g=rsGP(ec);const r=new Array(ec).fill(0);for(const d of data){const f=d^r[0];for(let i=0;i<ec-1;i++)r[i]=r[i+1];r[ec-1]=0;for(let j=0;j<ec;j++)r[j]^=GF.mul(g[j+1],f);}return r;}
-function vBCH(v){let x=(v&0x3f)<<12;const g=0x1f25;for(let i=17;i>=12;i--)if((x>>i)&1)x^=g<<(i-12);return x&0xfff;}
-function wVI(M,v){if(v<7)return;const n=M.length,vr=v&0x3f,bi=(vr<<12)|vBCH(vr);for(let y=0;y<3;y++)for(let x=0;x<6;x++)M[n-11+y][x]=(bi>>(y+3*x))&1;for(let y=0;y<6;y++)for(let x=0;x<3;x++)M[y][n-11+x]=(bi>>(y*3+x))&1;}
+    <script type="module">
+        import { makeQr } from 'qr-kit';
+        import { makeQrSvgString, makeQrPathSplit } from 'qr-kit/renderers/svg';
+        import { downloadQrPng } from 'qr-kit/utils/raster';
+        import { downloadQrJpeg } from 'qr-kit/utils/jpegQr';
+        import { buildQrLink } from 'qr-kit/utils/link';
+        import { buildQrPdfBytes } from 'qr-kit/utils/pdf';
+        import { buildQrWithLogoSvgAsync } from 'qr-kit/utils/logo';
+        import { computeLayout } from 'qr-kit/utils/layout';
 
-/* computeLayout */
-function computeLayout(mc,sz,mg){const o=Math.max(1,Math.floor(sz)),q=Math.max(0,Math.floor(mg)),u=o-2*q,ms=Math.max(1,Math.floor(u/mc)),inn=ms*mc,ex=Math.max(0,o-(inn+2*q));return{outer:o,moduleSize:ms,quietLeft:q+Math.floor(ex/2),quietTop:q+Math.floor(ex/2)};}
+        // DOM elements
+        const tabs = document.querySelectorAll('.tab');
+        const panels = {
+            basic: document.getElementById('basic-panel'),
+            logo: document.getElementById('logo-panel'),
+            link: document.getElementById('link-panel'),
+            pdf: document.getElementById('pdf-panel')
+        };
+        const qrStage = document.getElementById('qrOutput');
+        const metaVersion = document.getElementById('metaVersion');
+        const metaSize = document.getElementById('metaSize');
+        const metaEcc = document.getElementById('metaEcc');
+        const metaBytes = document.getElementById('metaBytes');
+        const toast = document.getElementById('toast');
 
-/* url helpers */
-function b64u(s){const u=new TextEncoder().encode(s);let b='';for(let i=0;i<u.length;i++)b+=String.fromCharCode(u[i]);return btoa(b);}
-function byteLen(s){return new TextEncoder().encode(String(s)).length;}
-function sanUrl(input,{whitelist:wl=[],aggressive:ag=true,preserveProtocol:pp=true}={}){try{const u=new URL(input);const TR=new Set(['utm_source','utm_medium','utm_campaign','utm_term','utm_content','utm_id','gclid','fbclid','yclid','msclkid']);const kp=new Set(wl);const nx=new URLSearchParams();for(const[k,v]of u.searchParams.entries()){if(ag?kp.has(k):!TR.has(k)||kp.has(k))nx.append(k,v);}u.search=nx.toString()?`?${nx}`:'';return pp?u.toString():`${u.host}${u.pathname}${u.search}${u.hash}`;}catch{return String(input||'').trim();}}
-function buildQrLink({baseUrl,payload,paramName:pn='data',extraParams:ep={},qrBudgetBytes:bud=134,removeProtocol:rp=true,trimKey:tk=null,strategy:st='trim'}){const fB=b64u(JSON.stringify(payload));const fu=new URL(baseUrl);fu.searchParams.set(pn,fB);for(const[k,v]of Object.entries(ep))fu.searchParams.set(k,v);const fullUrl=fu.toString();const mkQ=b=>sanUrl(`${baseUrl}?${pn}=${b}`,{whitelist:[pn],aggressive:true,preserveProtocol:!rp});let qrUrl=mkQ(fB);if(byteLen(qrUrl)<=bud)return{fullUrl,qrUrl,trimmed:false,removed:false};if(st==='error')return{fullUrl,qrUrl:'',trimmed:false,removed:false,error:'too long'};if(st==='drop'||!tk){const r={...payload};if(tk)delete r[tk];return{fullUrl,qrUrl:mkQ(b64u(JSON.stringify(r))),trimmed:false,removed:!!tk};}const orig=String(payload[tk]||'').trim();let lo=0,hi=orig.length,best=-1,bestQ='';while(lo<=hi){const mid=(lo+hi)>>1;const c={...payload};const cut=orig.slice(0,mid);if(cut)c[tk]=cut;else delete c[tk];const u=mkQ(b64u(JSON.stringify(c)));if(byteLen(u)<=bud){best=mid;bestQ=u;lo=mid+1;}else hi=mid-1;}if(best>=0)return{fullUrl,qrUrl:bestQ,trimmed:best<orig.length,removed:false};const fb={...payload};delete fb[tk];return{fullUrl,qrUrl:mkQ(b64u(JSON.stringify(fb))),trimmed:false,removed:true};}
+        let currentModel = null;
+        let currentSvgString = '';
+        let currentMode = 'basic'; // 'basic', 'rounded', 'branded'
+        let currentFnColor = '#f97316';
 
-/* SVG renderer */
-function renderQrSvg(model,{size,margin,fg,bg}){
-  const{outer,moduleSize:ms,quietLeft:ql,quietTop:qt}=computeLayout(model.size,size,margin);
-  const NS='http://www.w3.org/2000/svg';const svg=document.createElementNS(NS,'svg');
-  svg.setAttribute('width',outer);svg.setAttribute('height',outer);svg.setAttribute('viewBox',`0 0 ${outer} ${outer}`);
-  svg.setAttribute('role','img');svg.setAttribute('aria-label','QR code');svg.setAttribute('xmlns',NS);svg.setAttribute('shape-rendering','crispEdges');
-  const t=document.createElementNS(NS,'title');t.textContent='QR Code';svg.appendChild(t);
-  const bg_=document.createElementNS(NS,'rect');bg_.setAttribute('width','100%');bg_.setAttribute('height','100%');bg_.setAttribute('fill',bg);svg.appendChild(bg_);
-  const g=document.createElementNS(NS,'g');g.setAttribute('fill',fg);
-  for(let y=0;y<model.size;y++)for(let x=0;x<model.size;x++)if(model.modules[y][x]){const r=document.createElementNS(NS,'rect');r.setAttribute('x',ql+x*ms);r.setAttribute('y',qt+y*ms);r.setAttribute('width',ms);r.setAttribute('height',ms);g.appendChild(r);}
-  svg.appendChild(g);return svg;
-}
+        // --- Mode switching ---
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                if (btn.dataset.mode === mode) {
+                    btn.style.background = '#7cfc6e';
+                    btn.style.color = '#000';
+                    btn.style.border = '1px solid transparent';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = '#e8eaf0';
+                    btn.style.border = '1px solid #2a2e3a';
+                }
+            });
+            document.getElementById('fnColorField').style.display = mode === 'branded' ? 'block' : 'none';
+            renderBasic();
+        }
 
-/* raster */
-async function svgToPng(svgEl,scale=2){
-  let s=new XMLSerializer().serializeToString(svgEl);
-  if(!s.match(/^<svg[^>]+xmlns=/))s=s.replace('<svg','<svg xmlns="http://www.w3.org/2000/svg"');
-  const vb=svgEl.viewBox?.baseVal;const w=Math.floor((vb?.width||svgEl.width.baseVal.value)*scale);const h=Math.floor((vb?.height||svgEl.height.baseVal.value)*scale);
-  const img=new Image();await new Promise((r,e)=>{img.onload=r;img.onerror=e;img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s);});
-  const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d');ctx.imageSmoothingEnabled=false;ctx.drawImage(img,0,0,w,h);return c.toDataURL('image/png');
-}
-function dataURLBytes(u){const b64=u.split(',')[1];const bin=atob(b64);const a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return a;}
-async function pngToJpegBytes(pu,q=0.92){const img=new Image();await new Promise((r,e)=>{img.onload=r;img.onerror=e;img.src=pu;});const c=document.createElement('canvas');c.width=img.width;c.height=img.height;c.getContext('2d').drawImage(img,0,0);return dataURLBytes(c.toDataURL('image/jpeg',q));}
-function dataUrlToImg(u){return new Promise((r,e)=>{const img=new Image();img.onload=()=>r(img);img.onerror=e;img.src=u;});}
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => setMode(btn.dataset.mode));
+        });
 
-/* PDF builder (zero-dependency) */
-function al(u){let s='';for(let i=0;i<u.length;i++)s+=String.fromCharCode(u[i]);return s;}
-function sl(str){const o=new Uint8Array(str.length);for(let i=0;i<str.length;i++)o[i]=str.charCodeAt(i)&0xFF;return o;}
-function cb(...ps){let t=0;for(const p of ps)t+=p.length;const o=new Uint8Array(t);let off=0;for(const p of ps){o.set(p,off);off+=p.length;}return o;}
-function imgStream(dict,bytes){return '<< '+dict+' >>\r\nstream\r\n'+al(bytes)+'\r\nendstream';}
-function rawStream(txt){return`<< /Length ${txt.length} >>\r\nstream\r\n${txt}\r\nendstream`;}
-function mkPDF(objs){
-  const hdr='%PDF-1.7\r\n%\xFF\xFF\xFF\xFF\r\n';
-  const parts=objs.map((o,i)=>`${i+1} 0 obj\r\n${o}\r\nendobj\r\n`);
-  const body=parts.join('');
-  const offs=[0];let cur=hdr.length;for(const p of parts){offs.push(cur);cur+=p.length;}
-  const xs=hdr.length+body.length;
-  let xr=`xref\r\n0 ${objs.length+1}\r\n0000000000 65535 f \r\n`;
-  for(let i=1;i<=objs.length;i++)xr+=`${String(offs[i]).padStart(10,'0')} 00000 n \r\n`;
-  const tr=`trailer\r\n<< /Size ${objs.length+1} /Root ${objs.length} 0 R >>\r\nstartxref\r\n${xs}\r\n%%EOF`;
-  return cb(sl(hdr),sl(body),sl(xr),sl(tr));
-}
-function escPDF(s){return String(s).replace(/[\\()]/g,m=>({'\\':'\\\\','(':'\\(', ')':'\\)'}[m]));}
-function jpCS(u){let i=0;if(u[i++]!==0xFF||u[i++]!==0xD8)return{cs:'/DeviceRGB',d:''};while(i+4<u.length){if(u[i]!==0xFF){i++;continue;}const m=u[i+1];i+=2;if(m===0xDA)break;const l=(u[i]<<8)|u[i+1];i+=2;if(m===0xC0||m===0xC1||m===0xC2){const n=u[i+5];return n===1?{cs:'/DeviceGray',d:''}:n===4?{cs:'/DeviceCMYK',d:' /Decode [1 0 1 0 1 0 1 0]'}:{cs:'/DeviceRGB',d:''};} i+=l-2;}return{cs:'/DeviceRGB',d:''};}
+        document.getElementById('fnColor').addEventListener('input', (e) => {
+            currentFnColor = e.target.value;
+            if (currentMode === 'branded') renderBasic();
+        });
 
-async function buildQrPdf(svgEl, qr, page, title) {
-  const pW=page.width, pH=page.height;
-  const pngUrl = await svgToPng(svgEl, 3);
-  const qrJpeg = await pngToJpegBytes(pngUrl, 0.92);
-  const qrImg  = await dataUrlToImg(pngUrl);
-  const {cs, d} = jpCS(qrJpeg);
-  const objs=[]; const add=o=>{objs.push(o);return objs.length;};
-  const fId = add(`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>`);
-  const qId = add(imgStream(`/Type /XObject /Subtype /Image /Width ${qrImg.width} /Height ${qrImg.height} /ColorSpace ${cs}${d} /BitsPerComponent 8 /Filter /DCTDecode /Length ${qrJpeg.length}`, qrJpeg));
-  // page content
-  const c=[];
-  c.push(`1 g 0 0 ${pW} ${pH} re f 0 g`); // white bg
-  // dashed crosshair lines at QR origin
-  c.push(`0.9 0.2 0.2 RG 0.4 w [3 3] 0 d`);
-  c.push(`${qr.x} 0 m ${qr.x} ${pH} l S`);
-  c.push(`0 ${qr.y} m ${pW} ${qr.y} l S`);
-  c.push(`[] 0 d`); // reset dash
-  // QR image
-  c.push(`q ${qr.size} 0 0 ${qr.size} ${qr.x} ${qr.y} cm /ImQR Do Q`);
-  // title text
-  c.push(`BT /F1 18 Tf 0 g 40 ${pH-50} Td (${escPDF(title)}) Tj ET`);
-  // coordinate label
-  c.push(`BT /F1 9 Tf 0.5 0.5 0.5 rg 40 ${pH-72} Td (QR at x=${qr.x}pt  y=${qr.y}pt  size=${qr.size}pt  [measured from bottom-left]) Tj ET`);
-  // axis labels
-  c.push(`BT /F1 8 Tf 0.9 0.2 0.2 rg ${qr.x+2} 6 Td (x=${qr.x}) Tj ET`);
-  c.push(`BT /F1 8 Tf 2 ${qr.y+2} Td (y=${qr.y}) Tj ET`);
-  const cId = add(rawStream(c.join('\n')));
-  const rId = add(`<< /ProcSet [/PDF /Text /ImageC] /Font << /F1 ${fId} 0 R >> /XObject << /ImQR ${qId} 0 R >> >>`);
-  const pgId = add(`<< /Type /Page /Parent 0 0 R /MediaBox [0 0 ${pW} ${pH}] /Resources ${rId} 0 R /Contents ${cId} 0 R >>`);
-  const psId = add(`<< /Type /Pages /Kids [${pgId} 0 R] /Count 1 >>`);
-  objs[pgId-1]=`<< /Type /Page /Parent ${psId} 0 R /MediaBox [0 0 ${pW} ${pH}] /Resources ${rId} 0 R /Contents ${cId} 0 R >>`;
-  add(`<< /Type /Catalog /Pages ${psId} 0 R >>`);
-  return mkPDF(objs);
-}
+        // --- Theme buttons ---
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const fg = btn.dataset.fg;
+                const bg = btn.dataset.bg;
+                document.getElementById('fg').value = fg;
+                document.getElementById('bg').value = bg;
+                renderBasic();
+            });
+        });
 
-/* APP STATE */
-let currentEcc='L', currentModel=null, currentSvg=null;
-const PAGES={a4:{width:595.276,height:841.890},a5:{width:419.528,height:595.276},letter:{width:612,height:792}};
-let currentPage=PAGES.a4;
+        // --- Tab switching ---
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const target = tab.dataset.tab;
+                Object.values(panels).forEach(p => p.style.display = 'none');
+                panels[target].style.display = 'block';
+            });
+        });
 
-function getState(){return{value:document.getElementById('qrValue').value.trim()||' ',size:+document.getElementById('qrSize').value,margin:+document.getElementById('qrMargin').value,fg:document.getElementById('fgHex').value||'#000000',bg:document.getElementById('bgHex').value||'#ffffff',eccLevel:currentEcc,maxVersion:+document.getElementById('maxVersion').value};}
+        // --- Render QR from model (used by renderBasic) ---
+        function renderQr(model) {
+            const size = parseInt(document.getElementById('size').value) || 256;
+            const margin = parseInt(document.getElementById('margin').value) || 16;
+            const fg = document.getElementById('fg').value;
+            const bg = document.getElementById('bg').value;
 
-function render(){
-  const{value,size,margin,fg,bg,eccLevel,maxVersion}=getState();
-  const stage=document.getElementById('qrStage');
-  const out=document.getElementById('qrOutput');
-  stage.style.background=bg;
-  try{
-    currentModel=makeQr(value,{eccLevel,maxVersion});
-    currentSvg=renderQrSvg(currentModel,{size,margin,fg,bg});
-    out.innerHTML='';out.appendChild(currentSvg);
-    document.getElementById('metaVersion').textContent=`v${currentModel.version}`;
-    document.getElementById('metaMatrix').textContent=`${currentModel.size}×${currentModel.size}`;
-    document.getElementById('metaEcc').textContent=currentModel.eccLevel;
-    document.getElementById('metaBytes').textContent=`${new TextEncoder().encode(value).length}`;
-    updatePdfPreview();
-  }catch(e){
-    currentModel=null;currentSvg=null;
-    out.innerHTML=`<div class="qr-error">⚠ ${e.message}</div>`;
-    ['metaVersion','metaMatrix','metaEcc'].forEach(id=>document.getElementById(id).textContent='—');
-    document.getElementById('metaBytes').textContent=`${new TextEncoder().encode(value).length}`;
-  }
-}
+            let rounded = false;
+            if (currentMode === 'rounded') {
+                rounded = true;
+            } else if (currentMode === 'basic') {
+                const roundedCheckbox = document.getElementById('rounded');
+                rounded = roundedCheckbox ? roundedCheckbox.checked : false;
+            }
 
-/* PDF live preview on canvas */
-function updatePdfPreview(){
-  const canvas=document.getElementById('pdfCanvas');
-  if(!canvas)return;
-  const qrX=+document.getElementById('pdf_x').value||0;
-  const qrY=+document.getElementById('pdf_y').value||0;
-  const qrSz=+document.getElementById('pdf_size').value||100;
-  const{width:pW,height:pH}=currentPage;
-  // scale to fit ~280px display width
-  const displayW=Math.min(280,document.querySelector('.panel-body').offsetWidth-2||280);
-  const sc=displayW/pW;
-  canvas.width=Math.round(pW*sc);canvas.height=Math.round(pH*sc);
-  const ctx=canvas.getContext('2d');
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  // white page
-  ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.strokeStyle='#e0e0e0';ctx.lineWidth=1;ctx.strokeRect(0,0,canvas.width,canvas.height);
-  // PDF y=0 is bottom-left, canvas y=0 is top-left
-  const cy=pdfY=>canvas.height-pdfY*sc;
-  // dashed crosshairs
-  ctx.save();ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(255,80,80,0.45)';ctx.lineWidth=0.8;
-  ctx.beginPath();ctx.moveTo(qrX*sc,0);ctx.lineTo(qrX*sc,canvas.height);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(0,cy(qrY));ctx.lineTo(canvas.width,cy(qrY));ctx.stroke();
-  ctx.restore();
-  // QR placeholder + actual QR pixels
-  const rx=qrX*sc, ry=cy(qrY+qrSz), rs=qrSz*sc;
-  if(currentModel&&rs>0){
-    const{fg,bg}=getState();
-    const{moduleSize:ms,quietLeft:ql,quietTop:qt}=computeLayout(currentModel.size,qrSz*sc,3);
-    ctx.fillStyle=bg;ctx.fillRect(rx,ry,rs,rs);
-    ctx.fillStyle=fg;
-    for(let y=0;y<currentModel.size;y++)for(let x=0;x<currentModel.size;x++)
-      if(currentModel.modules[y][x])ctx.fillRect(rx+ql+x*ms,ry+qt+y*ms,ms,ms);
-  }else{
-    ctx.fillStyle='rgba(124,252,110,0.1)';ctx.fillRect(rx,ry,rs,rs);
-  }
-  ctx.strokeStyle='rgba(124,252,110,0.8)';ctx.lineWidth=1;ctx.strokeRect(rx,ry,rs,rs);
-  // labels
-  const fs=Math.max(7,Math.round(8*sc));ctx.font=`${fs}px monospace`;ctx.fillStyle='#e55';
-  const lx=qrX*sc;const ly=cy(qrY);
-  if(lx+2<canvas.width-20)ctx.fillText(`x=${qrX}`,lx+2,canvas.height-3);
-  if(ly-3>10)ctx.fillText(`y=${qrY}`,3,ly-3);
-}
+            let svgString;
+            if (currentMode === 'branded') {
+                const { dataPath, functionPath } = makeQrPathSplit(model, { size, margin });
+                const title = 'QR Code';
+                const escapedTitle = title.replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+                const { outer } = computeLayout(model.size, size, margin);
+                svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="${outer}" height="${outer}" viewBox="0 0 ${outer} ${outer}" role="img" aria-label="${escapedTitle}" shape-rendering="crispEdges">
+                    <title>${escapedTitle}</title>
+                    <rect width="100%" height="100%" fill="${bg.replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]))}"/>
+                    <path fill="${fg.replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]))}" d="${dataPath}"/>
+                    <path fill="${currentFnColor.replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]))}" d="${functionPath}"/>
+                </svg>`;
+            } else {
+                svgString = makeQrSvgString(model, { size, margin, fg, bg, rounded });
+            }
 
-/* EXPOSED */
-window.render=render;
-window.updatePdfPreview=updatePdfPreview;
-window.updateRange=(rid,lid)=>{const v=document.getElementById(rid).value;document.getElementById(lid).textContent=v;const e=document.getElementById(lid+'2');if(e)e.textContent=v;};
-window.setEcc=(l,btn)=>{currentEcc=l;document.querySelectorAll('.seg-control button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');render();};
-window.syncColor=w=>{document.getElementById(w+'Hex').value=document.getElementById(w+'Picker').value;render();};
-window.syncHex=w=>{const v=document.getElementById(w+'Hex').value;if(/^#[0-9a-fA-F]{6}$/.test(v)){document.getElementById(w+'Picker').value=v;render();}};
-window.setTheme=(fg,bg)=>{document.getElementById('fgHex').value=fg;document.getElementById('bgHex').value=bg;document.getElementById('fgPicker').value=fg;document.getElementById('bgPicker').value=bg;render();};
-window.switchTab=name=>{const ns=['generator','urlbuilder','pdf','download'];document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',ns[i]===name));document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));document.getElementById('tab-'+name).classList.add('active');if(name==='pdf')updatePdfPreview();};
-window.setPdfPage=(key,btn)=>{currentPage=PAGES[key];document.querySelectorAll('#pageSegCtrl button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');updatePdfPreview();};
+            qrStage.innerHTML = svgString;
+            currentSvgString = svgString;
 
-window.generatePdf=async()=>{
-  if(!currentSvg){toast('Generate a QR code first');return;}
-  const btn=document.getElementById('pdfBtn');
-  btn.disabled=true;btn.innerHTML='<div class="spinner"></div> Building PDF…';
-  try{
-    const qr={x:+document.getElementById('pdf_x').value||0,y:+document.getElementById('pdf_y').value||0,size:+document.getElementById('pdf_size').value||100};
-    const title=document.getElementById('pdf_title').value||'QR Code';
-    const fname=document.getElementById('pdf_filename').value||'qr-code.pdf';
-    const bytes=await buildQrPdf(currentSvg,qr,currentPage,title);
-    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));a.download=fname;a.click();a.remove();
-    toast('PDF downloaded — open it to scan the QR!');
-  }catch(e){toast('PDF error: '+e.message);}
-  finally{btn.disabled=false;btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download PDF';}
-};
+            metaVersion.textContent = model.version;
+            metaSize.textContent = model.size + '×' + model.size;
+            metaEcc.textContent = model.eccLevel;
+            metaBytes.textContent = new TextEncoder().encode(document.getElementById('inputText').value).length;
+        }
 
-window.buildLink=()=>{
-  const bUrl=document.getElementById('lb_baseUrl').value.trim(),rawJ=document.getElementById('lb_payload').value.trim();
-  const pn=document.getElementById('lb_param').value.trim()||'data',tk=document.getElementById('lb_trimKey').value.trim()||null;
-  const bud=+document.getElementById('lb_budget').value||134,st=document.getElementById('lb_strategy').value;
-  const res=document.getElementById('lb_result');
-  try{
-    const pl=JSON.parse(rawJ);const out=buildQrLink({baseUrl:bUrl,payload:pl,paramName:pn,qrBudgetBytes:bud,removeProtocol:true,trimKey:tk,strategy:st});
-    const chip=out.error?'<span class="tag-chip red">error</span>':out.removed?'<span class="tag-chip red">dropped</span>':out.trimmed?'<span class="tag-chip">trimmed</span>':'<span class="tag-chip">fits ✓</span>';
-    res.innerHTML=`<strong>Full URL (${byteLen(out.fullUrl)}B)</strong><span>${out.fullUrl}</span><br><br><strong>QR URL (${byteLen(out.qrUrl)}B / budget ${bud}B) ${chip}</strong><span>${out.qrUrl||'<em style="color:var(--red)">empty</em>'}</span>`;
-    res.classList.add('visible');window._lastQrUrl=out.qrUrl;
-  }catch(e){res.innerHTML=`<strong>Error</strong><span style="color:var(--red)">${e.message}</span>`;res.classList.add('visible');}
-};
-window.useLinkInQr=()=>{if(!window._lastQrUrl)return;document.getElementById('qrValue').value=window._lastQrUrl;switchTab('generator');render();toast('qrUrl loaded!');};
+        // --- Main render function (called on input change) ---
+        async function renderBasic() {
+            const text = document.getElementById('inputText').value || ' ';
+            const ecc = document.getElementById('ecc').value;
+            const maxVersion = parseInt(document.getElementById('maxVersion').value);
 
-window.downloadSvg=()=>{if(!currentSvg)return;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(currentSvg)],{type:'image/svg+xml'}));a.download='qr.svg';a.click();a.remove();toast('SVG downloaded!');};
-window.downloadPng=async()=>{if(!currentSvg)return;const a=document.createElement('a');a.href=await svgToPng(currentSvg,3);a.download='qr.png';a.click();a.remove();toast('PNG downloaded!');};
-window.downloadJpeg=async()=>{if(!currentModel||!currentSvg)return;const{size,margin,fg,bg}=getState();const{outer:o,moduleSize:ms,quietLeft:ql,quietTop:qt}=computeLayout(currentModel.size,size,margin);const c=document.createElement('canvas');c.width=o;c.height=o;const ctx=c.getContext('2d');ctx.imageSmoothingEnabled=false;ctx.fillStyle=bg;ctx.fillRect(0,0,o,o);ctx.fillStyle=fg;for(let y=0;y<currentModel.size;y++)for(let x=0;x<currentModel.size;x++)if(currentModel.modules[y][x])ctx.fillRect(ql+x*ms,qt+y*ms,ms,ms);const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',0.92));const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='qr.jpeg';a.click();a.remove();toast('JPEG downloaded!');};
-window.copySvgSource=()=>{if(!currentSvg)return;navigator.clipboard.writeText(new XMLSerializer().serializeToString(currentSvg));toast('SVG source copied!');};
-window.copyDataUrl=async()=>{if(!currentSvg)return;navigator.clipboard.writeText(await svgToPng(currentSvg,2));toast('PNG data URL copied!');};
+            try {
+                const model = makeQr(text, { eccLevel: ecc, maxVersion });
+                currentModel = model;
+                renderQr(model);
+            } catch (e) {
+                qrStage.innerHTML = `<div style="color:#ff5c5c">Error: ${e.message}</div>`;
+                currentModel = null;
+            }
+        }
 
-function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
-window.toast=toast;
+        document.getElementById('renderBtn').addEventListener('click', renderBasic);
 
-document.getElementById('qrValue').addEventListener('input',render);
-render();buildLink();
-</script>
+        // --- Download handlers ---
+        document.getElementById('downloadSvg').addEventListener('click', () => {
+            const blob = new Blob([currentSvgString], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'qr.svg'; a.click();
+            URL.revokeObjectURL(url);
+            toastMsg('SVG downloaded');
+        });
+
+        document.getElementById('downloadPng').addEventListener('click', async () => {
+            const svg = document.querySelector('#qrStage svg');
+            if (!svg) return;
+            await downloadQrPng(svg, { fileName: 'qr.png' });
+            toastMsg('PNG downloaded');
+        });
+
+        document.getElementById('downloadJpeg').addEventListener('click', async () => {
+            const text = document.getElementById('inputText').value;
+            const size = parseInt(document.getElementById('size').value);
+            const margin = parseInt(document.getElementById('margin').value);
+            const fg = document.getElementById('fg').value;
+            const bg = document.getElementById('bg').value;
+            const ecc = document.getElementById('ecc').value;
+            const maxVersion = parseInt(document.getElementById('maxVersion').value);
+
+            await downloadQrJpeg({
+                value: text,
+                size, margin, fg, bg,
+                eccLevel: ecc,
+                maxVersion,
+                fileName: 'qr.jpeg'
+            });
+            toastMsg('JPEG downloaded');
+        });
+
+        // --- Logo ---
+        let logoDataUrl = null;
+        document.getElementById('logoFile').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                logoDataUrl = ev.target.result;
+                toastMsg('Logo loaded');
+            };
+            reader.readAsDataURL(file);
+        });
+
+        document.getElementById('renderLogoBtn').addEventListener('click', async () => {
+            if (!logoDataUrl) { toastMsg('Select a logo first'); return; }
+            const text = document.getElementById('inputText').value;
+            const ecc = document.getElementById('ecc').value;
+            const maxVersion = parseInt(document.getElementById('maxVersion').value);
+            const size = parseInt(document.getElementById('size').value);
+            const margin = parseInt(document.getElementById('margin').value);
+            const fg = document.getElementById('fg').value;
+            const bg = document.getElementById('bg').value;
+            const coverage = parseInt(document.getElementById('coverage').value) / 100;
+            const logoPadding = parseInt(document.getElementById('logoPadding').value);
+            const logoBg = document.getElementById('logoBg').value;
+
+            try {
+                const model = makeQr(text, { eccLevel: ecc, maxVersion });
+                currentModel = model;
+
+                const svgString = await buildQrWithLogoSvgAsync(model, logoDataUrl, {
+                    size, margin, fg, bg,
+                    maxCoverage: coverage,
+                    logoPadding,
+                    logoBg
+                });
+                qrStage.innerHTML = svgString;
+                currentSvgString = svgString;
+
+                metaVersion.textContent = model.version;
+                metaSize.textContent = model.size + '×' + model.size;
+                metaEcc.textContent = model.eccLevel;
+                metaBytes.textContent = new TextEncoder().encode(text).length;
+            } catch (e) {
+                qrStage.innerHTML = `<div style="color:#ff5c5c">Logo error: ${e.message}</div>`;
+            }
+        });
+
+        // --- Link Builder ---
+        document.getElementById('buildLinkBtn').addEventListener('click', () => {
+            const baseUrl = document.getElementById('baseUrl').value;
+            const payloadStr = document.getElementById('payload').value;
+            const paramName = document.getElementById('paramName').value;
+            const trimKey = document.getElementById('trimKey').value;
+            const budget = parseInt(document.getElementById('budget').value);
+            const strategy = document.getElementById('strategy').value;
+
+            try {
+                const payload = JSON.parse(payloadStr);
+                const result = buildQrLink({
+                    baseUrl,
+                    payload,
+                    paramName,
+                    trimKey,
+                    qrBudgetBytes: budget,
+                    strategy,
+                    removeProtocol: true
+                });
+
+                const resultDiv = document.getElementById('linkResult');
+
+                let statusHtml = '';
+                if (result.error) {
+                    statusHtml = `<span class="tag" style="background:#ff5c5c;color:white">${result.error}</span>`;
+                } else if (result.removed) {
+                    statusHtml = '<span class="tag" style="background:#ffa500">dropped</span>';
+                } else if (result.trimmed) {
+                    statusHtml = '<span class="tag">trimmed</span>';
+                } else {
+                    statusHtml = '<span class="tag" style="background:#7cfc6e;color:#000">fits</span>';
+                }
+
+                resultDiv.innerHTML = `
+                    <div><strong>Full URL</strong> (${new TextEncoder().encode(result.fullUrl).length} B)</div>
+                    <div style="word-break:break-all;margin-bottom:0.5rem">${result.fullUrl}</div>
+                    <div><strong>QR URL</strong> (${result.qrUrl ? new TextEncoder().encode(result.qrUrl).length + ' B' : 'error'}) 
+                        ${statusHtml}
+                    </div>
+                    <div style="word-break:break-all">${result.qrUrl || '—'}</div>
+                `;
+                resultDiv.style.display = 'block';
+
+                if (result.qrUrl) {
+                    document.getElementById('inputText').value = result.qrUrl;
+                    renderBasic();
+                }
+            } catch (e) {
+                document.getElementById('linkResult').innerHTML = `<span style="color:#ff5c5c">Invalid JSON: ${e.message}</span>`;
+            }
+        });
+
+        // --- PDF ---
+        document.getElementById('downloadPdf').addEventListener('click', async () => {
+            const svg = document.querySelector('#qrStage svg');
+            if (!svg) { toastMsg('Generate a QR first'); return; }
+
+            const pageW = parseFloat(document.getElementById('pageW').value);
+            const pageH = parseFloat(document.getElementById('pageH').value);
+            const qrX = parseFloat(document.getElementById('pdfX').value);
+            const qrY = parseFloat(document.getElementById('pdfY').value);
+            const qrSize = parseFloat(document.getElementById('pdfSize').value);
+            const title = document.getElementById('pdfTitle').value;
+            const org = document.getElementById('pdfOrg').value;
+
+            try {
+                const pdfBytes = await buildQrPdfBytes({
+                    svgEl: svg,
+                    page: { width: pageW, height: pageH },
+                    qr: { x: qrX, y: qrY, size: qrSize },
+                    title,
+                    org
+                });
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = 'qr.pdf'; a.click();
+                URL.revokeObjectURL(url);
+                toastMsg('PDF downloaded');
+            } catch (e) {
+                toastMsg('PDF error: ' + e.message);
+            }
+        });
+
+        // --- Utilities ---
+        function toastMsg(msg) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // Initial render
+        renderBasic();
+
+        // Update on any input change (debounced)
+        const inputs = ['inputText', 'size', 'margin', 'ecc', 'maxVersion', 'fg', 'bg', 'rounded'];
+        inputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', renderBasic);
+        });
+    </script>
 </body>
 </html>

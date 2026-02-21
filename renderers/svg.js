@@ -22,37 +22,29 @@ import { computeLayout } from '../utils/layout.js';
 export function makeQrPath(model, { size = 256, margin = 16, rounded = false } = {}) {
   const { moduleSize, quietLeft, quietTop } = computeLayout(model.size, size, margin);
   const { modules, size: n } = model;
-
   if (!rounded) {
-    // Fastest path: one M + h + v + h + z per dark module
     let d = '';
     const ms = moduleSize;
     for (let y = 0; y < n; y++) {
       for (let x = 0; x < n; x++) {
         if (modules[y * n + x]) {
           const px = quietLeft + x * ms;
-          const py = quietTop  + y * ms;
+          const py = quietTop + y * ms;
           d += `M${px} ${py}h${ms}v${ms}h-${ms}z`;
         }
       }
     }
     return d;
   }
-
-  // Rounded corners: proper arc commands
   const ms = moduleSize;
-  const r  = Math.max(1, Math.round(ms * 0.35));
-  let d    = '';
+  const r = Math.max(1, Math.round(ms * 0.35));
+  let d = '';
   for (let y = 0; y < n; y++) {
     for (let x = 0; x < n; x++) {
       if (modules[y * n + x]) {
         const px = quietLeft + x * ms;
-        const py = quietTop  + y * ms;
-        d += `M${px + r},${py}`
-          + `h${ms - 2 * r}a${r},${r} 0 0 1 ${r},${r}`
-          + `v${ms - 2 * r}a${r},${r} 0 0 1 -${r},${r}`
-          + `h-${ms - 2 * r}a${r},${r} 0 0 1 -${r},-${r}`
-          + `v-${ms - 2 * r}a${r},${r} 0 0 1 ${r},-${r}z`;
+        const py = quietTop + y * ms;
+        d += `M${px + r},${py}h${ms - 2 * r}a${r},${r} 0 0 1 ${r},${r}v${ms - 2 * r}a${r},${r} 0 0 1 -${r},${r}h-${ms - 2 * r}a${r},${r} 0 0 1 -${r},-${r}v-${ms - 2 * r}a${r},${r} 0 0 1 ${r},-${r}z`;
       }
     }
   }
@@ -73,15 +65,15 @@ export function makeQrPathSplit(model, { size = 256, margin = 16 } = {}) {
   const { moduleSize: ms, quietLeft: ql, quietTop: qt } = computeLayout(model.size, size, margin);
   const { modules, functionMask, size: n } = model;
   let dataPath = '', functionPath = '';
-
   for (let y = 0; y < n; y++) {
     for (let x = 0; x < n; x++) {
-      const i  = y * n + x;
+      const i = y * n + x;
       if (!modules[i]) continue;
-      const px = ql + x * ms, py = qt + y * ms;
+      const px = ql + x * ms;
+      const py = qt + y * ms;
       const seg = `M${px} ${py}h${ms}v${ms}h-${ms}z`;
       if (functionMask[i]) functionPath += seg;
-      else                  dataPath    += seg;
+      else dataPath += seg;
     }
   }
   return { dataPath, functionPath };
@@ -102,31 +94,22 @@ export function makeQrPathSplit(model, { size = 256, margin = 16 } = {}) {
  * @returns {string} Complete SVG markup.
  */
 export function makeQrSvgString(model, {
-  size    = 256,
-  margin  = 16,
-  fg      = '#000',
-  bg      = '#fff',
-  title   = 'QR Code',
+  size = 256,
+  margin = 16,
+  fg = '#000',
+  bg = '#fff',
+  title = 'QR Code',
   rounded = false,
+  fnColor = null,
 } = {}) {
   const { outer } = computeLayout(model.size, size, margin);
-  const d = makeQrPath(model, { size, margin, rounded });
+  const escape = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" `
-       + `width="${outer}" height="${outer}" viewBox="0 0 ${outer} ${outer}" `
-       + `role="img" aria-label="${escapeAttr(title)}" shape-rendering="crispEdges">`
-       + `<title>${escapeXml(title)}</title>`
-       + `<rect width="100%" height="100%" fill="${escapeAttr(bg)}"/>`
-       + `<path fill="${escapeAttr(fg)}" d="${d}"/>`
-       + `</svg>`;
+  if (fnColor) {
+    const { dataPath, functionPath } = makeQrPathSplit(model, { size, margin });
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${outer}" height="${outer}" viewBox="0 0 ${outer} ${outer}" role="img" aria-label="${escape(title)}" shape-rendering="crispEdges"><title>${escape(title)}</title><rect width="100%" height="100%" fill="${escape(bg)}"/><path fill="${escape(fg)}" d="${dataPath}"/><path fill="${escape(fnColor)}" d="${functionPath}"/></svg>`;
+  } else {
+    const d = makeQrPath(model, { size, margin, rounded });
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${outer}" height="${outer}" viewBox="0 0 ${outer} ${outer}" role="img" aria-label="${escape(title)}" shape-rendering="crispEdges"><title>${escape(title)}</title><rect width="100%" height="100%" fill="${escape(bg)}"/><path fill="${escape(fg)}" d="${d}"/></svg>`;
+  }
 }
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function escapeXml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-  }[c]));
-}
-
-function escapeAttr(s) { return escapeXml(s); }
