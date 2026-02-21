@@ -1,6 +1,6 @@
 {
   "name": "qr-kit",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "description": "Complete QR code toolkit. Zero dependencies. Logo overlay, PDF export, link optimizer. 5.4 kB core.",
   "type": "module",
   "main": "index.js",
