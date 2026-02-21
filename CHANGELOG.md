@@ -7,6 +7,18 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [2.2.4] - 2026-02-21
+
+### Fixed
+- Fixed bug with QR code not being recognized
+
+### Changed
+- Improved CONTRIBUTING.md with contribution ideas
+- Updated README with correct anchors
+- Added images to README
+
+---
+
 ## [2.2.3] - 2025-02-22
 
 ### Fixed
