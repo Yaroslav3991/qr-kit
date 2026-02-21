@@ -311,13 +311,13 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md)
 
 ## 📝 License
 
-MIT © [Your Name](https://github.com/your-org)
+MIT © [Yaroslav3991](https://github.com/Yaroslav3991)
 
 ---
 
 ## 🌟 Show your support
 
-If this library saved you time, give it a ⭐ on [GitHub](https://github.com/your-org/qr-code)!
+If this library saved you time, give it a ⭐ on [GitHub](https://github.com/Yaroslav3991/qr-kit)!
 
 **Built with ❤️ to prove that npm packages don't need dependencies to be powerful.**
 
