@@ -7,7 +7,7 @@
 [![npm version](https://img.shields.io/npm/v/qr-kit?color=success)](https://www.npmjs.com/package/qr-kit)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/qr-kit?label=gzip&color=success)](https://bundlephobia.com/package/qr-kit)
 [![tests](https://img.shields.io/badge/tests-109%20passing-success)](tests/)
-[![license](https://img.shields.io/npm/l/qr-kit)](LICENSE)
+[![license](https://img.shields.io/npm/l/qr-kit)](https://github.com/Yaroslav3991/qr-kit/blob/main/LICENSE)
 
 **[🛝 Live Playground](playground/index.html)** · **[📖 Docs](#installation)** · **[🎨 Examples](#quick-start)**
 
