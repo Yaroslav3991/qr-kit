@@ -40,8 +40,8 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install TypeScript
-        run: npm install --no-save typescript
+      - name: Install TypeScript and React types
+        run: npm install --no-save typescript @types/react
 
       - name: Check declarations compile
         run: npx tsc --strict --noEmit --moduleResolution bundler --module esnext types/index.d.ts
