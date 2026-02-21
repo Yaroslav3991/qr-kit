@@ -66,7 +66,7 @@ import { buildQrWithLogoSvgAsync } from 'qr-kit/utils/logo';
 const model = makeQr('https://example.com', { eccLevel: 'M' });
 const svg = await buildQrWithLogoSvgAsync(model, '/logo.svg', {
   size: 400,
-  maxCoverage: 0.11, // 11% of QR area — safe for ECC M
+  maxCoverage: 0.06, // 6% of QR area — recommended for reliable scanning with ECC M
 });
 
 document.body.innerHTML = svg; // self-contained SVG string

@@ -136,8 +136,8 @@ export function runTests() {
   });
 
   // ── Coverage constants ───────────────────────────────────────────────────
-  test('LOGO_MAX_COVERAGE_ECC_M is in expected range [0.08, 0.14]', () => {
-    assert(LOGO_MAX_COVERAGE_ECC_M >= 0.08 && LOGO_MAX_COVERAGE_ECC_M <= 0.14,
+  test('LOGO_MAX_COVERAGE_ECC_M is in expected range [0.04, 0.14]', () => {
+    assert(LOGO_MAX_COVERAGE_ECC_M >= 0.04 && LOGO_MAX_COVERAGE_ECC_M <= 0.14,
       `ECC M coverage ${LOGO_MAX_COVERAGE_ECC_M} out of expected range`);
   });
 

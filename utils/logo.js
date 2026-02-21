@@ -26,7 +26,7 @@ import { makeQrPathSplit } from '../renderers/svg.js';
 // ─── Public constants ──────────────────────────────────────────────────────────
 
 /** Maximum fraction of QR area safe to cover with ECC M (~15% budget, 4% safety margin). */
-export const LOGO_MAX_COVERAGE_ECC_M = 0.11;
+export const LOGO_MAX_COVERAGE_ECC_M = 0.06;
 
 /** Maximum fraction of QR area safe to cover with ECC L (~7% budget, 3% safety margin). */
 export const LOGO_MAX_COVERAGE_ECC_L = 0.04;
