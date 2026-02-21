@@ -9,7 +9,8 @@
 [![tests](https://img.shields.io/badge/tests-109%20passing-success)](tests/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Yaroslav3991/qr-kit/blob/main/LICENSE)
 
-**[🛝 Live Playground](https://yaroslav3991.github.io/qr-kit/)** · **[📖 Docs](#api-reference)** · **[🎨 Examples](#more-examples)**
+**[🛝 Live Playground](https://yaroslav3991.github.io/qr-kit/)** · **[⚡ Quick Start](#-quick-start)** · **[🎨 Logo Overlay](#-logo-overlay--the-killer-feature)** · **[📚 API Docs](#-api-reference)**
+
 
 <img src="docs/hero-demo.gif" width="600" alt="QR code with logo overlay demo" />
 
