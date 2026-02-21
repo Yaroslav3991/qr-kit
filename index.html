@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>qr-kit · playground</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: #0b0c0f;
+            color: #e8eaf0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            line-height: 1.5;
+            padding: 2rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+        header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+        }
+        .logo {
+            background: #7cfc6e;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            gap: 3px;
+            padding: 6px;
+        }
+        .logo span {
+            background: #0b0c0f;
+            border-radius: 2px;
+        }
+        .logo span:nth-child(1),
+        .logo span:nth-child(3),
+        .logo span:nth-child(7),
+        .logo span:nth-child(9) {
+            background: #7cfc6e;
+        }
+        .title h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        .title p {
+            color: #5a5f73;
+            font-size: 0.9rem;
+        }
+        .badge {
+            margin-left: auto;
+            display: flex;
+            gap: 0.5rem;
+        }
+        .badge a {
+            color: #7cfc6e;
+            text-decoration: none;
+            border: 1px solid #2a2e3a;
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            transition: 0.15s;
+        }
+        .badge a:hover {
+            border-color: #7cfc6e;
+            background: #1f232b;
+        }
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 1px solid #2a2e3a;
+            padding-bottom: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .tab {
+            background: none;
+            border: none;
+            color: #5a5f73;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 30px;
+            transition: 0.15s;
+        }
+        .tab:hover {
+            color: #e8eaf0;
+            background: #1f232b;
+        }
+        .tab.active {
+            background: #7cfc6e;
+            color: #0b0c0f;
+        }
+        .panel {
+            background: #13151a;
+            border: 1px solid #2a2e3a;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 2rem;
+        }
+        .qr-stage {
+            background: #fff;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            padding: 1rem;
+            border: 1px solid #2a2e3a;
+        }
+        .qr-stage svg, .qr-stage canvas {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+        }
+        .field {
+            margin-bottom: 1.2rem;
+        }
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: #5a5f73;
+            margin-bottom: 0.3rem;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 0.6rem 1rem;
+            background: #0b0c0f;
+            border: 1px solid #2a2e3a;
+            border-radius: 12px;
+            color: #e8eaf0;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: #7cfc6e;
+        }
+        .row {
+            display: flex;
+            gap: 1rem;
+        }
+        .row .field {
+            flex: 1;
+        }
+        button {
+            background: #7cfc6e;
+            color: #0b0c0f;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.15s;
+            border: 1px solid transparent;
+        }
+        button:hover {
+            background: #9aff8e;
+            transform: translateY(-1px);
+        }
+        button.secondary {
+            background: transparent;
+            border: 1px solid #2a2e3a;
+            color: #e8eaf0;
+        }
+        button.secondary:hover {
+            border-color: #7cfc6e;
+            color: #7cfc6e;
+        }
+        .button-group {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .meta {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: #5a5f73;
+        }
+        .meta span {
+            color: #7cfc6e;
+            font-weight: 600;
+            margin-left: 0.3rem;
+        }
+        .url-result {
+            background: #0b0c0f;
+            border: 1px solid #2a2e3a;
+            border-radius: 12px;
+            padding: 1rem;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 0.8rem;
+            margin-top: 1rem;
+        }
+        .tag {
+            display: inline-block;
+            background: #1f232b;
+            color: #7cfc6e;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 30px;
+            margin-left: 0.5rem;
+        }
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #7cfc6e;
+            color: #0b0c0f;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            opacity: 0;
+            transition: 0.2s;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .toast.show {
+            opacity: 1;
+        }
+        /* Цветовые контролы как в твоём проекте */
+        .color-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        input[type="color"] {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid #2a2e3a;
+            cursor: pointer;
+            padding: 2px;
+            background: #0b0c0f;
+        }
+        .color-hex {
+            flex: 1;
+            padding: 0.6rem 1rem;
+            background: #0b0c0f;
+            border: 1px solid #2a2e3a;
+            border-radius: 12px;
+            color: #e8eaf0;
+            font-size: 0.85rem;
+            outline: none;
+        }
+        .color-hex:focus {
+            border-color: #7cfc6e;
+        }
+        /* Для вкладок внутри панели */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        /* Кнопки режимов */
+        .mode-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .mode-btn {
+            flex: 1;
+            background: transparent;
+            border: 1px solid #2a2e3a;
+            color: #e8eaf0;
+        }
+        .mode-btn.active {
+            background: #7cfc6e;
+            color: #000;
+            border-color: transparent;
+        }
+        /* Поле для Branded появляется под кнопками */
+        #fnColorField {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        /* Адаптивность */
+        @media (max-width: 800px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span></span><span></span><span></span>
+                <span></span><span></span><span></span>
+                <span></span><span></span><span></span>
+            </div>
+            <div class="title">
+                <h1>qr-kit · playground</h1>
+                <p>zero‑dependency QR toolkit – try it live</p>
+            </div>
+            <div class="badge">
+                <a href="https://github.com/Yaroslav3991/qr-kit" target="_blank">GitHub</a>
+                <a href="https://www.npmjs.com/package/qr-kit" target="_blank">npm</a>
+            </div>
+        </header>
+
+        <!-- Вкладки верхнего уровня -->
+        <div class="tabs" id="tabs">
+            <button class="tab active" data-tab="basic">Basic</button>
+            <button class="tab" data-tab="logo">Logo</button>
+            <button class="tab" data-tab="link">Link Builder</button>
+            <button class="tab" data-tab="pdf">PDF Export</button>
+        </div>
+
+        <div class="grid">
+            <!-- Левая колонка – настройки -->
+            <div>
+                <!-- Basic panel -->
+                <div id="basic-panel" class="tab-content active">
+                    <div class="panel">
+                        <h3 style="margin-bottom:1rem">QR Generator</h3>
+                        <div class="field">
+                            <label>Content</label>
+                            <textarea id="inputText" rows="3">https://github.com/Yaroslav3991/qr-kit</textarea>
+                        </div>
+                        <div class="row">
+                            <div class="field">
+                                <label>Size (px)</label>
+                                <input type="number" id="size" value="256" min="50" max="600">
+                            </div>
+                            <div class="field">
+                                <label>Margin (px)</label>
+                                <input type="number" id="margin" value="16" min="0" max="50">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="field">
+                                <label>ECC</label>
+                                <select id="ecc">
+                                    <option value="L">L (7%)</option>
+                                    <option value="M" selected>M (15%)</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Max version</label>
+                                <select id="maxVersion">
+                                    <option value="6">v6 (134B)</option>
+                                    <option value="10">v10 (271B)</option>
+                                    <option value="12">v12 (360B)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="field">
+                                <label>Foreground</label>
+                                <div class="color-row">
+                                    <input type="color" id="fgPicker" value="#000000">
+                                    <input type="text" class="color-hex" id="fgHex" value="#000000">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>Background</label>
+                                <div class="color-row">
+                                    <input type="color" id="bgPicker" value="#ffffff">
+                                    <input type="text" class="color-hex" id="bgHex" value="#ffffff">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Render mode: Basic / Rounded / Branded -->
+                        <div class="field">
+                            <label>Render mode</label>
+                            <div class="mode-buttons">
+                                <button type="button" class="mode-btn active" data-mode="basic">Basic</button>
+                                <button type="button" class="mode-btn" data-mode="rounded">Rounded</button>
+                                <button type="button" class="mode-btn" data-mode="branded">Branded</button>
+                            </div>
+                        </div>
+
+                        <!-- Finder color field (shown only for branded) -->
+                        <div id="fnColorField" style="display: none;">
+                            <label>Finder color</label>
+                            <div class="color-row">
+                                <input type="color" id="fnPicker" value="#f97316">
+                                <input type="text" class="color-hex" id="fnHex" value="#f97316">
+                            </div>
+                        </div>
+
+                        <!-- Action buttons: Render and downloads -->
+                        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                            <button id="renderBtn" style="min-width: 120px;">Render QR</button>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="secondary" id="downloadSvg">⬇ Download SVG</button>
+                                <button class="secondary" id="downloadPng">⬇ Download PNG</button>
+                                <button class="secondary" id="downloadJpeg">⬇ Download JPEG</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logo panel (без изменений, но добавим цветовой пикер как везде) -->
+                <div id="logo-panel" class="tab-content">
+                    <div class="panel">
+                        <h3 style="margin-bottom:1rem">Logo Overlay</h3>
+                        <div class="field">
+                            <label>Logo image</label>
+                            <input type="file" id="logoFile" accept="image/*">
+                        </div>
+                        <div class="row">
+                            <div class="field">
+                                <label>Coverage (%)</label>
+                                <input type="number" id="coverage" value="6" min="1" max="20">
+                            </div>
+                            <div class="field">
+                                <label>Padding (px)</label>
+                                <input type="number" id="logoPadding" value="4" min="0" max="20">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Logo background color</label>
+                            <div class="color-row">
+                                <input type="color" id="logoBgPicker" value="#ffffff">
+                                <input type="text" class="color-hex" id="logoBgHex" value="#ffffff">
+                            </div>
+                        </div>
+                        <button id="renderLogoBtn">Render with logo</button>
+                        <div id="logoDownloadButtons" style="display: none; margin-top: 1rem;">
+                            <div class="button-group">
+                                <button class="secondary" id="downloadLogoSvg" title="Download as SVG">⬇ Download SVG</button>
+                                <button class="secondary" id="downloadLogoPng" title="Download as PNG">⬇ Download PNG</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Link Builder panel -->
+                <div id="link-panel" class="tab-content">
+                    <div class="panel">
+                        <h3 style="margin-bottom:1rem">Link Builder</h3>
+                        <div class="field">
+                            <label>Base URL</label>
+                            <input type="text" id="baseUrl" value="https://example.com/landing">
+                        </div>
+                        <div class="field">
+                            <label>JSON payload</label>
+                            <textarea id="payload" rows="4">{"userId":"abc123","plan":"pro","code":"SUMMER2024"}</textarea>
+                        </div>
+                        <div class="row">
+                            <div class="field">
+                                <label>Param name</label>
+                                <input type="text" id="paramName" value="data">
+                            </div>
+                            <div class="field">
+                                <label>Trim key</label>
+                                <input type="text" id="trimKey" value="code">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="field">
+                                <label>Budget (bytes)</label>
+                                <input type="number" id="budget" value="134" min="10" max="400">
+                            </div>
+                            <div class="field">
+                                <label>Strategy</label>
+                                <select id="strategy">
+                                    <option value="trim">trim</option>
+                                    <option value="drop">drop</option>
+                                    <option value="error">error</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button id="buildLinkBtn">Build link</button>
+                        <div class="url-result" id="linkResult" style="display: none;"></div>
+                        <button id="useQrUrlBtn" style="display: none; margin-top: 1rem;">Use QR URL in generator</button>
+                    </div>
+                </div>
+
+                <!-- PDF Export panel -->
+                <div id="pdf-panel" class="tab-content">
+                    <div class="panel">
+                        <h3 style="margin-bottom:1rem">PDF Export</h3>
+                        <div class="row">
+                            <div class="field">
+                                <label>Page width (pt)</label>
+                                <input type="number" id="pageW" value="595.276" step="0.1">
+                            </div>
+                            <div class="field">
+                                <label>Page height (pt)</label>
+                                <input type="number" id="pageH" value="841.89" step="0.1">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="field">
+                                <label>QR X (pt)</label>
+                                <input type="number" id="pdfX" value="420">
+                            </div>
+                            <div class="field">
+                                <label>QR Y (pt)</label>
+                                <input type="number" id="pdfY" value="130">
+                            </div>
+                            <div class="field">
+                                <label>QR size (pt)</label>
+                                <input type="number" id="pdfSize" value="160">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="field">
+                                <label>Title</label>
+                                <input type="text" id="pdfTitle" value="My QR Code">
+                            </div>
+                            <div class="field">
+                                <label>Organization</label>
+                                <input type="text" id="pdfOrg" value="Your Company">
+                            </div>
+                        </div>
+                        <button id="downloadPdf">Download PDF</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Правая колонка – предпросмотр -->
+            <div>
+                <div class="panel" style="padding:1rem">
+                    <div class="qr-stage" id="qrStage">
+                        <div id="qrOutput"></div>
+                    </div>
+                    <div class="meta">
+                        <div>version <span id="metaVersion">-</span></div>
+                        <div>size <span id="metaSize">-</span></div>
+                        <div>ECC <span id="metaEcc">-</span></div>
+                        <div>bytes <span id="metaBytes">-</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Copied!</div>
+
+<script type="importmap">
+    {
+        "imports": {
+            "qr-kit": "https://esm.sh/qr-kit@2.2.3",
+            "qr-kit/": "https://esm.sh/qr-kit@2.2.3/"
+        }
+    }
+</script>
+
+    <script type="module">
+        import { makeQr } from 'qr-kit';
+        import { makeQrSvgString } from 'qr-kit/renderers/svg';
+        import { downloadQrPng } from 'qr-kit/utils/raster';
+        import { downloadQrJpeg } from 'qr-kit/utils/jpegQr';
+        import { buildQrLink } from 'qr-kit/utils/link';
+        import { buildQrPdfBytes } from 'qr-kit/utils/pdf';
+        import { buildQrWithLogoSvgAsync } from 'qr-kit/utils/logo';
+        import { computeLayout } from 'qr-kit/utils/layout';
+
+        // DOM elements
+        const tabs = document.querySelectorAll('#tabs .tab');
+        const panels = {
+            basic: document.getElementById('basic-panel'),
+            logo: document.getElementById('logo-panel'),
+            link: document.getElementById('link-panel'),
+            pdf: document.getElementById('pdf-panel')
+        };
+        const qrStage = document.getElementById('qrOutput');
+        const metaVersion = document.getElementById('metaVersion');
+        const metaSize = document.getElementById('metaSize');
+        const metaEcc = document.getElementById('metaEcc');
+        const metaBytes = document.getElementById('metaBytes');
+        const toast = document.getElementById('toast');
+
+        let currentModel = null;
+        let currentSvgString = '';
+        let currentMode = 'basic'; // 'basic', 'rounded', 'branded'
+        let currentFnColor = '#f97316';
+        let logoDataUrl = null;
+
+        // --- Tab switching ---
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const target = tab.dataset.tab;
+                Object.values(panels).forEach(p => p.style.display = 'none');
+                panels[target].style.display = 'block';
+                if (target === 'basic' || target === 'logo') {
+                    renderBasic();
+                }
+            });
+        });
+
+        // --- Render mode buttons ---
+        const modeBtns = document.querySelectorAll('.mode-btn');
+        const fnColorField = document.getElementById('fnColorField');
+
+        function setMode(mode) {
+            currentMode = mode;
+            modeBtns.forEach(btn => {
+                if (btn.dataset.mode === mode) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            fnColorField.style.display = mode === 'branded' ? 'block' : 'none';
+            renderBasic();
+        }
+
+        modeBtns.forEach(btn => {
+            btn.addEventListener('click', () => setMode(btn.dataset.mode));
+        });
+
+        // --- Color picker sync helpers ---
+        function setupColorPicker(pickerId, hexId, callback) {
+            const picker = document.getElementById(pickerId);
+            const hex = document.getElementById(hexId);
+            picker.addEventListener('input', () => {
+                hex.value = picker.value;
+                if (callback) callback(picker.value);
+                else renderBasic();
+            });
+            hex.addEventListener('input', () => {
+                if (/^#[0-9A-F]{6}$/i.test(hex.value)) {
+                    picker.value = hex.value;
+                    if (callback) callback(picker.value);
+                    else renderBasic();
+                }
+            });
+        }
+
+        setupColorPicker('fgPicker', 'fgHex');
+        setupColorPicker('bgPicker', 'bgHex');
+        setupColorPicker('fnPicker', 'fnHex', (val) => {
+            currentFnColor = val;
+            if (currentMode === 'branded') renderBasic();
+        });
+
+        // Logo color picker
+        setupColorPicker('logoBgPicker', 'logoBgHex');
+
+        // --- Render function ---
+        async function renderBasic() {
+            const text = document.getElementById('inputText').value || ' ';
+            const ecc = document.getElementById('ecc').value;
+            const maxVersion = parseInt(document.getElementById('maxVersion').value);
+            const size = parseInt(document.getElementById('size').value) || 256;
+            const margin = parseInt(document.getElementById('margin').value) || 16;
+            const fg = document.getElementById('fgPicker').value;
+            const bg = document.getElementById('bgPicker').value;
+
+            try {
+                const model = makeQr(text, { eccLevel: ecc, maxVersion });
+                currentModel = model;
+
+                let svgString;
+                if (currentMode === 'branded') {
+                    svgString = makeQrSvgString(model, { size, margin, fg, bg, fnColor: currentFnColor });
+                } else {
+                    const rounded = currentMode === 'rounded';
+                    svgString = makeQrSvgString(model, { size, margin, fg, bg, rounded });
+                }
+
+                qrStage.innerHTML = svgString;
+                currentSvgString = svgString;
+
+                metaVersion.textContent = model.version;
+                metaSize.textContent = model.size + '×' + model.size;
+                metaEcc.textContent = model.eccLevel;
+                metaBytes.textContent = new TextEncoder().encode(text).length;
+            } catch (e) {
+                qrStage.innerHTML = `<div style="color:#ff5c5c">Error: ${e.message}</div>`;
+                currentModel = null;
+            }
+        }
+
+        document.getElementById('renderBtn').addEventListener('click', renderBasic);
+
+        // --- Download handlers ---
+        document.getElementById('downloadSvg').addEventListener('click', () => {
+            if (!currentSvgString) { toastMsg('Generate a QR first'); return; }
+            const blob = new Blob([currentSvgString], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'qr.svg'; a.click();
+            URL.revokeObjectURL(url);
+            toastMsg('SVG downloaded');
+        });
+
+        document.getElementById('downloadPng').addEventListener('click', async () => {
+            const svg = document.querySelector('#qrStage svg');
+            if (!svg) { toastMsg('Generate a QR first'); return; }
+            await downloadQrPng(svg, { fileName: 'qr.png' });
+            toastMsg('PNG downloaded');
+        });
+
+        document.getElementById('downloadJpeg').addEventListener('click', async () => {
+            const text = document.getElementById('inputText').value;
+            const size = parseInt(document.getElementById('size').value);
+            const margin = parseInt(document.getElementById('margin').value);
+            const fg = document.getElementById('fgPicker').value;
+            const bg = document.getElementById('bgPicker').value;
+            const ecc = document.getElementById('ecc').value;
+            const maxVersion = parseInt(document.getElementById('maxVersion').value);
+
+            await downloadQrJpeg({
+                value: text,
+                size, margin, fg, bg,
+                eccLevel: ecc,
+                maxVersion,
+                fileName: 'qr.jpeg'
+            });
+            toastMsg('JPEG downloaded');
+        });
+
+        // --- Logo tab ---
+        document.getElementById('logoFile').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                logoDataUrl = ev.target.result;
+                toastMsg('Logo loaded');
+            };
+            reader.readAsDataURL(file);
+        });
+
+        document.getElementById('renderLogoBtn').addEventListener('click', async () => {
+            if (!logoDataUrl) { toastMsg('Select a logo first'); return; }
+            const text = document.getElementById('inputText').value;
+            const ecc = document.getElementById('ecc').value;
+            const maxVersion = parseInt(document.getElementById('maxVersion').value);
+            const size = parseInt(document.getElementById('size').value);
+            const margin = parseInt(document.getElementById('margin').value);
+            const fg = document.getElementById('fgPicker').value;
+            const bg = document.getElementById('bgPicker').value;
+            const coverage = parseInt(document.getElementById('coverage').value) / 100;
+            const logoPadding = parseInt(document.getElementById('logoPadding').value);
+            const logoBg = document.getElementById('logoBgPicker').value;
+
+            try {
+                const model = makeQr(text, { eccLevel: ecc, maxVersion });
+                currentModel = model;
+
+                const svgString = await buildQrWithLogoSvgAsync(model, logoDataUrl, {
+                    size, margin, fg, bg,
+                    maxCoverage: coverage,
+                    logoPadding,
+                    logoBg
+                });
+                qrStage.innerHTML = svgString;
+                currentSvgString = svgString;
+
+                metaVersion.textContent = model.version;
+                metaSize.textContent = model.size + '×' + model.size;
+                metaEcc.textContent = model.eccLevel;
+                metaBytes.textContent = new TextEncoder().encode(text).length;
+
+                document.getElementById('logoDownloadButtons').style.display = 'block';
+            } catch (e) {
+                qrStage.innerHTML = `<div style="color:#ff5c5c">Logo error: ${e.message}</div>`;
+            }
+        });
+
+        // Download from logo tab
+        document.getElementById('downloadLogoSvg').addEventListener('click', () => {
+            if (!currentSvgString) return;
+            const blob = new Blob([currentSvgString], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'qr-with-logo.svg'; a.click();
+            URL.revokeObjectURL(url);
+            toastMsg('SVG downloaded');
+        });
+
+        document.getElementById('downloadLogoPng').addEventListener('click', async () => {
+            const svg = document.querySelector('#qrStage svg');
+            if (!svg) return;
+            await downloadQrPng(svg, { fileName: 'qr-with-logo.png' });
+            toastMsg('PNG downloaded');
+        });
+
+        // --- Link Builder ---
+        document.getElementById('buildLinkBtn').addEventListener('click', () => {
+            const baseUrl = document.getElementById('baseUrl').value;
+            const payloadStr = document.getElementById('payload').value;
+            const paramName = document.getElementById('paramName').value;
+            const trimKey = document.getElementById('trimKey').value;
+            const budget = parseInt(document.getElementById('budget').value);
+            const strategy = document.getElementById('strategy').value;
+
+            try {
+                const payload = JSON.parse(payloadStr);
+                const result = buildQrLink({
+                    baseUrl,
+                    payload,
+                    paramName,
+                    trimKey,
+                    qrBudgetBytes: budget,
+                    strategy,
+                    removeProtocol: true
+                });
+
+                const resultDiv = document.getElementById('linkResult');
+                const useBtn = document.getElementById('useQrUrlBtn');
+
+                let statusHtml = '';
+                if (result.error) {
+                    statusHtml = `<span class="tag" style="background:#ff5c5c;color:white">${result.error}</span>`;
+                } else if (result.removed) {
+                    statusHtml = '<span class="tag" style="background:#ffa500">dropped</span>';
+                } else if (result.trimmed) {
+                    statusHtml = '<span class="tag">trimmed</span>';
+                } else {
+                    statusHtml = '<span class="tag" style="background:#7cfc6e;color:#000">fits</span>';
+                }
+
+                resultDiv.innerHTML = `
+                    <div><strong>Full URL</strong> (${new TextEncoder().encode(result.fullUrl).length} B)</div>
+                    <div style="word-break:break-all;margin-bottom:0.5rem">${result.fullUrl}</div>
+                    <div><strong>QR URL</strong> (${result.qrUrl ? new TextEncoder().encode(result.qrUrl).length + ' B' : 'error'}) 
+                        ${statusHtml}
+                    </div>
+                    <div style="word-break:break-all">${result.qrUrl || '—'}</div>
+                `;
+                resultDiv.style.display = 'block';
+
+                if (result.qrUrl) {
+                    useBtn.style.display = 'inline-block';
+                    useBtn.onclick = () => {
+                        document.getElementById('inputText').value = result.qrUrl;
+                        tabs[0].click(); // switch to basic tab
+                        renderBasic();
+                    };
+                } else {
+                    useBtn.style.display = 'none';
+                }
+            } catch (e) {
+                document.getElementById('linkResult').innerHTML = `<span style="color:#ff5c5c">Invalid JSON: ${e.message}</span>`;
+                document.getElementById('linkResult').style.display = 'block';
+                document.getElementById('useQrUrlBtn').style.display = 'none';
+            }
+        });
+
+        // --- PDF ---
+        document.getElementById('downloadPdf').addEventListener('click', async () => {
+            const svg = document.querySelector('#qrStage svg');
+            if (!svg) { toastMsg('Generate a QR first'); return; }
+
+            const pageW = parseFloat(document.getElementById('pageW').value);
+            const pageH = parseFloat(document.getElementById('pageH').value);
+            const qrX = parseFloat(document.getElementById('pdfX').value);
+            const qrY = parseFloat(document.getElementById('pdfY').value);
+            const qrSize = parseFloat(document.getElementById('pdfSize').value);
+            const title = document.getElementById('pdfTitle').value;
+            const org = document.getElementById('pdfOrg').value;
+
+            try {
+                const pdfBytes = await buildQrPdfBytes({
+                    svgEl: svg,
+                    page: { width: pageW, height: pageH },
+                    qr: { x: qrX, y: qrY, size: qrSize },
+                    title,
+                    org
+                });
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = 'qr.pdf'; a.click();
+                URL.revokeObjectURL(url);
+                toastMsg('PDF downloaded');
+            } catch (e) {
+                toastMsg('PDF error: ' + e.message);
+            }
+        });
+
+        // --- Utilities ---
+        function toastMsg(msg) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // Initial render
+        renderBasic();
+
+        // Update on any input change (debounced) for basic panel
+        const inputs = ['inputText', 'size', 'margin', 'ecc', 'maxVersion'];
+        let debounceTimer;
+        inputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(renderBasic, 150);
+            });
+        });
+    </script>
+</body>
+</html>
